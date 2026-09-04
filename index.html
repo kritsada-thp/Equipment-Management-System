@@ -325,6 +325,13 @@
             <button onclick="openBatchQrStatusModal()" class="flex-1 md:flex-none px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1 shadow-lg shadow-purple-600/20">
               <i class="ri-qr-code-line"></i> พิมพ์ QR
             </button>
+            <button onclick="downloadTemplate()" class="px-3 py-2 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 border border-emerald-500/30 rounded-xl text-xs font-semibold flex items-center gap-1">
+              <i class="ri-download-2-line"></i> Template
+            </button>
+            <input type="file" id="excelFileInput" accept=".xlsx, .csv" class="hidden" onchange="handleBulkImport(event)">
+            <button onclick="document.getElementById('excelFileInput').click()" class="px-3 py-2 bg-emerald-600 text-white hover:bg-emerald-500 rounded-xl text-xs font-semibold flex items-center gap-1">
+              <i class="ri-file-excel-line"></i> Import Excel
+            </button>
             <button onclick="exportFilteredAssetsExcel()" class="flex-1 md:flex-none px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1">
               <i class="ri-file-download-line"></i> Export
             </button>
@@ -1828,6 +1835,74 @@ function exportFilteredAssetsExcel() {
     showSpinner(false);
     playAudio('success');
   }, 300);
+}
+    function downloadTemplate() {
+  const headers = [[
+    "preAssetNo", "assetNo", "assetSubNo", "assetClass", "subClass", 
+    "description1", "description2", "serialNumber", "inventoryNumber", "quantity", 
+    "unit", "assetValue", "bookValue", "costCenter", "respCostCenter", 
+    "borrowingAgency", "oldBudgetCode", "functionalArea", "fundCenter", 
+    "licensePlateNo", "source", "assetSuperNo", "vendor", "manufacturer", 
+    "usefulLifeYear", "usefulLifeMonth", "poNo", "purchasingAgency", 
+    "createdAssetDate", "receivedDate", "transferredDate", "disposedDate", 
+    "replacementStatus", "replacementNote1", "replacementNote2", "receiptStatus", 
+    "confirmedDate", "inReqProcess"
+  ]];
+  const ws = XLSX.utils.aoa_to_sheet(headers);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Asset_Template");
+  XLSX.writeFile(wb, "Full_Asset_Import_Template.xlsx");
+}
+    function printQrStatusTags() {
+  const printArea = document.getElementById('printableArea');
+  const originalGrid = document.getElementById('qrStatusTagGrid');
+  
+  printArea.innerHTML = `
+    <div style="width: 210mm; margin: 0 auto; background: white; color: black; font-family: 'Sarabun', sans-serif;">
+      <h2 style="text-align: center; margin-bottom: 20px; font-weight: bold; font-size: 16px;">ป้าย QR Code ครุภัณฑ์</h2>
+      <div id="printQrGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;"></div>
+    </div>
+  `;
+  
+  const printGrid = document.getElementById('printQrGrid');
+  
+  Array.from(originalGrid.children).forEach((card) => {
+    const clone = card.cloneNode(true);
+    clone.removeAttribute('id');
+    const qrContainer = clone.querySelector('div[id^="qr_tag_"]');
+    if (qrContainer) qrContainer.removeAttribute('id');
+    
+    const canvas = clone.querySelector('canvas');
+    const img = clone.querySelector('img');
+    if (canvas) {
+      if (!img.src) img.src = canvas.toDataURL("image/png");
+      img.style.display = 'block';
+      img.style.width = '100%';
+      canvas.style.display = 'none';
+    }
+    
+    clone.style.border = '1px solid #cbd5e1';
+    clone.style.pageBreakInside = 'avoid';
+    clone.style.breakInside = 'avoid';
+    
+    printGrid.appendChild(clone);
+  });
+  
+  document.getElementById('mainApp').classList.add('hidden');
+  document.getElementById('batchQrModal').classList.add('hidden');
+  printArea.classList.remove('hidden');
+  
+  window.onafterprint = function() {
+    document.getElementById('mainApp').classList.remove('hidden');
+    document.getElementById('batchQrModal').classList.remove('hidden');
+    printArea.classList.add('hidden');
+    printArea.innerHTML = '';
+    window.onafterprint = null;
+  };
+
+  setTimeout(() => {
+    window.print();
+  }, 500);
 }
   </script>
 </body>
