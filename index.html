@@ -1383,28 +1383,24 @@
     }
 
     // ==========================================
-    // 4. LIVE QR SCANNER (Fast Scan Optimized)
-    // ==========================================
-    function openLiveScanner() {
+// อัปเกรด Live QR Scanner (สแกนเต็มจอ + ความละเอียด HD)
+// ==========================================
+function openLiveScanner() {
     document.getElementById('liveScanOverlay').classList.remove('hidden');
     document.getElementById('liveScanOverlay').classList.add('flex');
     document.getElementById('fallbackCameraBtn').classList.add('hidden');
     document.getElementById('qrScanStatusOverlay').innerText = "กำลังค้นหา QR Code...";
     
     setTimeout(() => {
-        // คำนวณขนาดกรอบ QR ให้ยืดหยุ่น ป้องกันกรอบล้นจอ
-        const screenMin = Math.min(window.innerWidth, window.innerHeight);
-        const qrboxSize = Math.floor(screenMin * 0.7);
-
         html5QrCodeLive = new Html5Qrcode("liveScanReader");
         
         html5QrCodeLive.start(
-            { facingMode: "environment" }, // บังคับใช้กล้องหลัง
+            // ขอความละเอียดระดับ HD เป็นต้นไป เพื่อให้กล้องชัดและอ่าน QR โค้ดบนหน้าจอได้ดีขึ้น
+            { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
             { 
-                fps: 10, // ใช้ 10 FPS เป็นค่ามาตรฐานที่เสถียรที่สุด ไม่ทำให้กล้องค้าง
-                qrbox: { width: qrboxSize, height: qrboxSize },
-                disableFlip: false // ป้องกันปัญหากล้องกลับซ้ายขวา
-                // ลบ useBarCodeDetectorIfSupported ออก เพื่อใช้ Engine มาตรฐานที่เสถียรกว่า
+                fps: 15, 
+                // สำคัญ: ปิด qrbox ทิ้งไปเลย เพื่อให้สแกนได้เต็มหน้าจอแบบ Native App
+                disableFlip: false 
             },
             (decodedText) => {
                 if(isScanning) return; 
@@ -1413,18 +1409,17 @@
                 addToCart(decodedText);
                 document.getElementById('qrScanStatusOverlay').innerText = "เพิ่มลงตะกร้าสำเร็จ!";
                 
-                // หน่วงเวลาเล็กน้อยก่อนปิดหน้ากล้อง ให้ผู้ใช้เห็นว่าสแกนติดแล้ว
                 setTimeout(() => {
                     closeLiveScanner();
                     isScanning = false;
-                }, 600);
+                }, 500);
             },
             (errorMessage) => {
                 // ตัวสแกนจะทำงานเงียบๆ จนกว่าจะเจอ QR
             }
         ).catch(err => {
             console.error("Camera Error: ", err);
-            document.getElementById('qrScanStatusOverlay').innerText = "ไม่สามารถเข้าถึงกล้องได้";
+            document.getElementById('qrScanStatusOverlay').innerText = "เบราว์เซอร์ไม่อนุญาตให้ใช้กล้อง";
             document.getElementById('fallbackCameraBtn').classList.remove('hidden');
         });
     }, 300);
@@ -1911,6 +1906,104 @@ function exportFilteredAssetsExcel() {
     window.print();
   }, 500);
 }
+  // ==========================================
+// ส่วนที่ขาดหายไป: ฟังก์ชันสำหรับจัดการตารางหน้า "ปรับสถานะ" (Tab 3)
+// ==========================================
+function renderStatusPaginatedTable() {
+  const tbody = document.getElementById('statusTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+
+  const total = statusFilteredAssets.length;
+  if (total === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">ไม่พบรายการครุภัณฑ์</td></tr>`;
+    updateStatusPaginationUI(0, 0, 0, 0);
+    return;
+  }
+
+  const totalPages = Math.ceil(total / statusPageSize);
+  if (statusCurrentPageNum > totalPages) statusCurrentPageNum = totalPages;
+
+  const startIndex = (statusCurrentPageNum - 1) * statusPageSize;
+  const endIndex = Math.min(startIndex + statusPageSize, total);
+  const pageData = statusFilteredAssets.slice(startIndex, endIndex);
+
+  pageData.forEach((item, pageIndex) => {
+    const globalIndex = startIndex + pageIndex;
+    const isChecked = statusSelectedAssetNos.has(item.assetNo);
+
+    const imageLinkBtn = item.attachmentUrl 
+      ? `<a href="${item.attachmentUrl}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40 rounded-xl text-[10px] font-semibold transition-colors"><i class="ri-folder-image-fill text-sm"></i> เปิดอัลบั้ม</a>` 
+      : `<span class="text-slate-600 text-[10px]">- ไม่มีรูป -</span>`;
+
+    tbody.innerHTML += `
+      <tr class="hover:bg-slate-900/50 transition-colors ${isChecked ? 'bg-red-950/20' : ''}">
+        <td class="p-3.5 text-center">
+          <input type="checkbox" value="${item.assetNo}" data-index="${globalIndex}" ${isChecked ? 'checked' : ''} onclick="handleStatusCheckboxClick(event, this)" class="rounded bg-slate-900 border-slate-700 text-red-600">
+        </td>
+        <td class="p-3.5 font-bold text-white">${item.assetNo || ''}</td>
+        <td class="p-3.5 text-slate-200">${item.description1 || ''}</td>
+        <td class="p-3.5"><span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-200 border border-slate-700">${item.current_status || 'ใช้งานปกติ'}</span></td>
+        <td class="p-3.5 text-slate-400">${item.current_holder || '-'}</td>
+        <td class="p-3.5 text-center">${imageLinkBtn}</td>
+        <td class="p-3.5 text-right">
+          <button onclick="viewStatusAuditLog('${item.assetNo}')" class="px-2.5 py-1 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-lg text-[10px] font-semibold flex items-center gap-1 ms-auto">
+            <i class="ri-history-line"></i> ประวัติ Log
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+
+  updateStatusPaginationUI(startIndex + 1, endIndex, total, totalPages);
+  document.getElementById('statusSelectCount').innerText = `เลือกอยู่ ${statusSelectedAssetNos.size} รายการ`;
+}
+
+function handleStatusCheckboxClick(e, chk) {
+  const currentIndex = parseInt(chk.getAttribute('data-index'));
+  const assetNo = chk.value;
+
+  if (e.shiftKey && lastCheckedIndexStatus !== null) {
+    const start = Math.min(lastCheckedIndexStatus, currentIndex);
+    const end = Math.max(lastCheckedIndexStatus, currentIndex);
+    for (let i = start; i <= end; i++) {
+      if (statusFilteredAssets[i]) statusSelectedAssetNos.add(statusFilteredAssets[i].assetNo);
+    }
+  } else {
+    if (chk.checked) statusSelectedAssetNos.add(assetNo);
+    else statusSelectedAssetNos.delete(assetNo);
+  }
+
+  lastCheckedIndexStatus = currentIndex;
+  renderStatusPaginatedTable();
+}
+
+function toggleSelectAllStatus(selectAllChk) {
+  if (selectAllChk.checked) {
+    statusFilteredAssets.forEach(item => statusSelectedAssetNos.add(item.assetNo));
+  } else {
+    statusSelectedAssetNos.clear();
+  }
+  renderStatusPaginatedTable();
+}
+
+function updateStatusPaginationUI(start, end, total, totalPages) {
+  document.getElementById('statusPaginationInfo').innerText = `แสดง ${start} - ${end} จาก ${total} รายการ`;
+  document.getElementById('statusPageNumberDisplay').innerText = `${statusCurrentPageNum} / ${totalPages || 1}`;
+  document.getElementById('btnStatusPrevPage').disabled = (statusCurrentPageNum <= 1);
+  document.getElementById('btnStatusNextPage').disabled = (statusCurrentPageNum >= totalPages || totalPages === 0);
+}
+
+function changeStatusPage(delta) {
+  statusCurrentPageNum += delta;
+  renderStatusPaginatedTable();
+}
+
+function changeStatusPageSize() {
+  statusPageSize = parseInt(document.getElementById('statusPageSizeSelect').value);
+  statusCurrentPageNum = 1;
+  renderStatusPaginatedTable();
+}  
   </script>
 </body>
 </html>
