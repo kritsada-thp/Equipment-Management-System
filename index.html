@@ -991,59 +991,89 @@
       renderPaginatedTable();
     }
 
-    function renderPaginatedTable() {
-      const tbody = document.getElementById('assetTableBody');
-      tbody.innerHTML = '';
-      const total = filteredAssets.length;
-      if (total === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-500">ไม่พบรายการ</td></tr>`;
-        updatePaginationUI(0, 0, 0, 0); return;
-      }
-      const totalPages = Math.ceil(total / pageSize);
-      if (currentPageNum > totalPages) currentPageNum = totalPages;
-      const startIndex = (currentPageNum - 1) * pageSize;
-      const endIndex = Math.min(startIndex + pageSize, total);
-      const pageData = filteredAssets.slice(startIndex, endIndex);
+    // ==========================================
+// 4. แก้ไขปุ่มในตารางหลัก ให้มีปุ่ม "คืนสภาพ" กรณีกดตัดจำหน่ายผิด
+// นำฟังก์ชันนี้ไป ทับ ของเดิม
+// ==========================================
+function renderPaginatedTable() {
+  const tbody = document.getElementById('assetTableBody');
+  tbody.innerHTML = '';
+  const total = filteredAssets.length;
+  if (total === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-500">ไม่พบรายการ</td></tr>`;
+    updatePaginationUI(0, 0, 0, 0); return;
+  }
+  const totalPages = Math.ceil(total / pageSize);
+  if (currentPageNum > totalPages) currentPageNum = totalPages;
+  const startIndex = (currentPageNum - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, total);
+  
+  filteredAssets.slice(startIndex, endIndex).forEach((item, pageIndex) => {
+    const globalIndex = startIndex + pageIndex;
+    const originalIndex = assetDataCache.findIndex(x => x.assetNo === item.assetNo);
+    const isChecked = selectedAssetNos.has(item.assetNo);
+    
+    let badge = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+    if (item.current_status.includes('ซ่อม')) badge = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+    else if (item.current_status.includes('ยืม')) badge = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+    else if (item.current_status.includes('ตัด')) badge = 'bg-red-500/10 text-red-400 border-red-500/20'; // เพิ่มสีแดงสำหรับของตัดจำหน่าย
 
-      pageData.forEach((item, pageIndex) => {
-        const globalIndex = startIndex + pageIndex;
-        const originalIndex = assetDataCache.findIndex(x => x.assetNo === item.assetNo);
-        const isChecked = selectedAssetNos.has(item.assetNo);
-        let badge = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-        if (item.current_status.includes('ซ่อม')) badge = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
-        else if (item.current_status.includes('ยืม')) badge = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
-
-        const lifeInfo = calculateRemainingLife(item.receivedDate, item.usefulLifeYear, item.usefulLifeMonth);
-        let lifeBadge = '';
-        if (lifeInfo.status === 'expired') lifeBadge = `<span class="text-red-500 font-bold">${lifeInfo.text}</span>`;
-        else if (lifeInfo.status === 'warning') lifeBadge = `<span class="text-amber-500 font-bold">${lifeInfo.text}</span>`;
-        else lifeBadge = `<span class="text-slate-400">${lifeInfo.text}</span>`;
-        
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-900/50 transition-colors ${isChecked ? 'bg-red-950/20' : ''}">
-            <td class="p-3.5 text-center"><input type="checkbox" value="${item.assetNo}" data-index="${globalIndex}" ${isChecked ? 'checked' : ''} onclick="handleCheckboxClick(event, this)" class="rounded bg-slate-900 border-slate-700 text-red-600"></td>
-            <td class="p-3.5 font-bold text-white">${item.assetNo || ''}</td>
-            <td class="p-3.5 text-slate-300 font-medium">${item.assetClass || '-'}</td>
-            <td class="p-3.5 text-slate-200">${item.description1 || ''}</td>
-            <td class="p-3.5 text-slate-400">${item.costCenter || ''}</td>
-            <td class="p-3.5"><span class="px-2.5 py-1 rounded-full text-[10px] font-semibold border ${badge}">${item.current_status || 'ปกติ'}</span></td>
-            <td class="p-3.5 text-center text-[10px]">${lifeBadge}</td>
-            <td class="p-3.5 text-slate-400">${item.current_holder || '-'}</td>
-            <td class="p-3.5 text-center">
-              <div class="flex items-center justify-center gap-1.5 flex-wrap">
-                <button onclick="showAssetDetail(${originalIndex})" class="px-2 py-1 bg-slate-800 text-slate-200 rounded-lg text-[10px]"><i class="ri-eye-line"></i></button>
-                <button onclick="openEditAssetModal('${item.assetNo}')" class="px-2 py-1 bg-amber-600/20 text-amber-400 rounded-lg text-[10px]">แก้ไข</button>
-                <button onclick="deleteSingleAsset('${item.assetNo}')" class="px-2 py-1 bg-red-600/20 text-red-400 rounded-lg text-[10px]"><i class="ri-delete-bin-line"></i></button>
-                <button onclick="addToCart('${item.assetNo}')" class="px-2 py-1 bg-blue-600/20 text-blue-400 rounded-lg text-[10px]">+ พ.10</button>
-              </div>
-            </td>
-          </tr>
-        `;
-      });
-      updatePaginationUI(startIndex + 1, endIndex, total, totalPages);
-      updateMultiSelectBar();
+    const lifeInfo = calculateRemainingLife(item.receivedDate, item.usefulLifeYear, item.usefulLifeMonth);
+    let lifeBadge = lifeInfo.status === 'expired' ? `<span class="text-red-500 font-bold">${lifeInfo.text}</span>` : 
+                    (lifeInfo.status === 'warning' ? `<span class="text-amber-500 font-bold">${lifeInfo.text}</span>` : `<span class="text-slate-400">${lifeInfo.text}</span>`);
+    
+    // ตรวจสอบสถานะ หากตัดจำหน่ายไปแล้ว ให้แสดงปุ่ม "คืนสภาพ" แทนปุ่ม "+ พ.10"
+    const isDisposed = item.current_status.includes('ตัดจำหน่าย') || item.current_status.includes('ตัดแล้ว');
+    let manageBtns = `
+      <button onclick="showAssetDetail(${originalIndex})" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-[10px]"><i class="ri-eye-line"></i></button>
+      <button onclick="openEditAssetModal('${item.assetNo}')" class="px-2 py-1 bg-amber-600/20 text-amber-400 rounded-lg text-[10px]">แก้ไข</button>
+      <button onclick="deleteSingleAsset('${item.assetNo}')" class="px-2 py-1 bg-red-600/20 text-red-400 rounded-lg text-[10px]"><i class="ri-delete-bin-line"></i></button>
+    `;
+    
+    if (isDisposed) {
+       manageBtns += `<button onclick="revertDisposal('${item.assetNo}')" class="px-2 py-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 rounded-lg text-[10px] font-semibold shadow-md"><i class="ri-arrow-go-back-line"></i> คืนสภาพ</button>`;
+    } else {
+       manageBtns += `<button onclick="addToCart('${item.assetNo}')" class="px-2 py-1 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 rounded-lg text-[10px] font-semibold">+ พ.10</button>`;
     }
 
+    tbody.innerHTML += `
+      <tr class="hover:bg-slate-900/50 transition-colors ${isChecked ? 'bg-red-950/20' : ''}">
+        <td class="p-3.5 text-center"><input type="checkbox" value="${item.assetNo}" data-index="${globalIndex}" ${isChecked ? 'checked' : ''} onclick="handleCheckboxClick(event, this)" class="rounded bg-slate-900 border-slate-700 text-red-600"></td>
+        <td class="p-3.5 font-bold text-white">${item.assetNo || ''}</td>
+        <td class="p-3.5 text-slate-300 font-medium">${item.assetClass || '-'}</td>
+        <td class="p-3.5 text-slate-200">${item.description1 || ''}</td>
+        <td class="p-3.5 text-slate-400">${item.costCenter || ''}</td>
+        <td class="p-3.5"><span class="px-2.5 py-1 rounded-full text-[10px] font-semibold border ${badge}">${item.current_status || 'ปกติ'}</span></td>
+        <td class="p-3.5 text-center text-[10px]">${lifeBadge}</td>
+        <td class="p-3.5 text-slate-400">${item.current_holder || '-'}</td>
+        <td class="p-3.5 text-center">
+          <div class="flex items-center justify-center gap-1.5 flex-wrap">
+            ${manageBtns}
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+  updatePaginationUI(startIndex + 1, endIndex, total, totalPages);
+  updateMultiSelectBar();
+}
+    // ==========================================
+// 5. ฟังก์ชันคืนสภาพกรณีตัดจำหน่ายผิดพลาด
+// ==========================================
+async function revertDisposal(assetNo) {
+    if(!confirm(`ต้องการยกเลิกการตัดจำหน่าย และดึงครุภัณฑ์ [${assetNo}] กลับมาเป็น "ใช้งานปกติ" ใช่หรือไม่?`)) return;
+    showSpinner(true, 'กำลังคืนสภาพครุภัณฑ์...');
+    try {
+        await callGAS("updateAssetOperationalStatus", {
+            assetNoList: [assetNo], status: "ใช้งานปกติ", holder: "-", remarks: "ดึงกลับจากการตัดจำหน่าย (ยกเลิก)",
+            imageBase64: null, fileName: '', userEmail: currentUser ? currentUser.email : "Staff"
+        });
+        showSpinner(false); playAudio('success'); alert('คืนสภาพครุภัณฑ์เรียบร้อยแล้ว');
+        loadAssetData();
+    } catch (err) { 
+        showSpinner(false); alert(err.message); 
+    }
+}
     function handleCheckboxClick(e, chk) {
       const currentIndex = parseInt(chk.getAttribute('data-index'));
       const assetNo = chk.value;
@@ -1413,12 +1443,21 @@
     function addToCart(assetNo) {
       if (!cart.includes(assetNo)) { cart.push(assetNo); playAudio('success'); renderCart(); }
     }
-    function renderCart() {
-      document.getElementById('cartCountBadge').innerText = cart.length + ' รายการ';
-      document.getElementById('p10Cart').innerHTML = cart.map((item, idx) => `
-        <li class="flex justify-between p-2.5 rounded-xl glass-card text-xs"><span><i class="ri-box-3-line text-red-500"></i> ${item}</span>
-        <button onclick="cart.splice(${idx},1);renderCart();" class="text-red-400"><i class="ri-delete-bin-line"></i></button></li>`).join('');
-    }
+    // ==========================================
+// 1. ฟังก์ชันตะกร้า (โชว์ทั้งเลขและชื่อครุภัณฑ์)
+// ==========================================
+function renderCart() {
+  document.getElementById('cartCountBadge').innerText = cart.length + ' รายการ';
+  document.getElementById('p10Cart').innerHTML = cart.map((item, idx) => {
+    const assetObj = assetDataCache.find(x => x.assetNo === item) || {};
+    const desc = assetObj.description1 ? ` <span class="text-slate-400 ml-1 truncate max-w-[150px]">- ${assetObj.description1}</span>` : '';
+    return `
+    <li class="flex justify-between items-center p-2.5 rounded-xl glass-card text-xs border border-slate-800">
+      <span class="flex items-center truncate pr-2"><i class="ri-box-3-line text-red-500 me-1"></i><strong>${item}</strong>${desc}</span>
+      <button onclick="cart.splice(${idx},1);renderCart();" class="text-red-400 hover:text-red-300 shrink-0"><i class="ri-delete-bin-line text-sm"></i></button>
+    </li>`;
+  }).join('');
+}
 
     function parseCustomDate(str) {
       if(!str) return null; let d = new Date(str);
@@ -1941,6 +1980,153 @@
       statusCurrentPageNum = 1;
       renderStatusPaginatedTable();
     }  
+    // ==========================================
+// 2. ฟังก์ชันหน้าต่างรายละเอียด พ.10 (รับคืนสินค้า/แนบรูป)
+// ==========================================
+function openP10DetailModal(docNo) {
+    const doc = p10DocsCache.find(x => x.docNo === docNo || x.p10running === docNo);
+    if (!doc) return;
+    activeP10Doc = doc;
+
+    document.getElementById('p10ModalTitle').innerHTML = `<i class="ri-file-text-line text-red-500"></i> จัดการใบ พ.10: <span class="text-emerald-400">${doc.docNo || doc.p10running}</span>`;
+    const content = document.getElementById('p10ModalContent');
+
+    // สร้างลิสต์ครุภัณฑ์พร้อม Checkbox สำหรับรับคืน
+    let itemsHtml = '';
+    let totalItems = (doc.items || []).length;
+    let returnedCount = 0;
+
+    (doc.items || []).forEach((itemId, idx) => {
+        const assetNo = typeof itemId === 'object' ? itemId.assetNo : itemId;
+        const assetObj = assetDataCache.find(x => x.assetNo === assetNo) || { current_status: 'ไม่ทราบ', description1: '-' };
+        
+        // เช็คว่าสถานะกลับมาเป็น "ใช้งานปกติ" หรือยัง (ถ้าใช่แปลว่าคืนแล้ว)
+        const isReturned = assetObj.current_status === 'ใช้งานปกติ';
+        if (isReturned) returnedCount++;
+
+        itemsHtml += `
+        <li class="flex justify-between items-center p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs">
+            <div class="flex items-center gap-2 overflow-hidden">
+                <input type="checkbox" id="return_chk_${idx}" value="${assetNo}" class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-emerald-500 shrink-0" ${isReturned ? 'checked disabled' : ''}>
+                <span class="truncate text-slate-300"><strong>${assetNo}</strong> - ${assetObj.description1}</span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <span class="px-2 py-1 rounded-md text-[10px] font-bold ${isReturned ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">${isReturned ? 'รับคืนแล้ว' : 'ยังไม่คืน'}</span>
+                <button onclick="removeP10Item(${idx})" class="text-slate-400 hover:text-red-400 ${isReturned ? 'hidden' : ''}"><i class="ri-delete-bin-line"></i></button>
+            </div>
+        </li>`;
+    });
+
+    let docStatusBadge = doc.docStatus === 'ส่งคืนสำเร็จ' ? 'text-emerald-400' : 'text-amber-400';
+
+    content.innerHTML = `
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+        <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800"><p class="text-slate-400 mb-1">ถึงหน่วยงาน:</p><p class="font-bold text-white">${doc.toAgency || '-'}</p></div>
+        <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800"><p class="text-slate-400 mb-1">ประเภท:</p><p class="font-bold text-white">${doc.type}</p></div>
+        <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 md:col-span-2"><p class="text-slate-400 mb-1">สถานะเอกสาร:</p><p class="font-bold ${docStatusBadge}">${doc.docStatus || 'ยืมใช้งานอยู่'} (${returnedCount}/${totalItems})</p></div>
+    </div>
+
+    <!-- ส่วนที่ 1: จัดการรับคืน -->
+    <div class="glass-card p-4 rounded-xl border border-slate-700 space-y-3">
+        <div class="flex flex-wrap justify-between items-center gap-2">
+            <h5 class="font-bold text-xs text-white"><i class="ri-checkbox-circle-line text-emerald-400 me-1"></i> รายการครุภัณฑ์ (ติ๊กเลือกเพื่อรับคืน)</h5>
+            <button onclick="processReturnP10Items()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-semibold flex items-center gap-1 shadow-lg shadow-emerald-500/20"><i class="ri-save-line"></i> ยืนยันรับคืน/เปลี่ยนสถานะ</button>
+        </div>
+        <ul class="space-y-2 max-h-40 overflow-y-auto hide-scrollbar">
+            ${itemsHtml || '<li class="text-slate-500 text-center py-2">ไม่มีรายการครุภัณฑ์</li>'}
+        </ul>
+        <div class="pt-2">
+            <label class="block text-[10px] text-slate-400 mb-1">หมายเหตุรับคืน / กรณีคืนไม่ครบ</label>
+            <input type="text" id="p10ModalStatusRemarks" class="w-full px-3 py-2 rounded-lg glass-input text-xs" placeholder="ระบุเหตุผลการคืนไม่ครบ..." value="${doc.statusRemarks || ''}">
+        </div>
+    </div>
+
+    <!-- ส่วนที่ 2: แนบภาพถ่าย (แยกโฟลเดอร์ตามเลข พ.10) -->
+    <div class="glass-card p-4 rounded-xl border border-slate-700 space-y-3">
+        <h5 class="font-bold text-xs text-white flex justify-between items-center">
+            <span><i class="ri-image-line text-red-500 me-1"></i> ภาพถ่ายเอกสาร / สภาพครุภัณฑ์ (เพิ่ม/ลบได้ตลอด)</span>
+        </h5>
+        <div class="flex flex-wrap items-center gap-2">
+            <input type="file" id="signedP10ImageInput" accept="image/*" class="text-xs text-slate-300 glass-input rounded-lg px-2 py-1.5 flex-1 min-w-[200px]">
+            <button onclick="uploadSignedImageToP10()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1"><i class="ri-upload-cloud-line"></i> อัปโหลด</button>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
+            ${(doc.signedImages || []).map(img => `
+            <div class="relative group bg-slate-900 border border-slate-800 p-1.5 rounded-xl text-center">
+                <img src="${img.url}" class="w-full h-24 object-cover rounded-lg">
+                <a href="${img.url}" target="_blank" class="text-[10px] text-blue-400 hover:text-blue-300 underline block mt-1 truncate">เปิดดูใน Drive</a>
+                <button onclick="deleteSignedP10Image('${img.fileId}')" class="absolute top-2 right-2 p-1 bg-red-600 hover:bg-red-500 text-white rounded-full text-[10px] shadow-lg"><i class="ri-delete-bin-line"></i></button>
+            </div>
+            `).join('')}
+        </div>
+    </div>
+    `;
+    document.getElementById('p10DetailModal').classList.remove('hidden');
+}
+
+function closeP10DetailModal() { document.getElementById('p10DetailModal').classList.add('hidden'); }
+    // ==========================================
+// 3. ฟังก์ชันประมวลผลการรับคืน (Return Checkbox Logic)
+// ==========================================
+async function processReturnP10Items() {
+    if (!activeP10Doc) return;
+    const doc = activeP10Doc;
+    let selectedToReturn = [];
+    let totalItems = (doc.items || []).length;
+    let alreadyReturnedCount = 0;
+
+    // รวบรวม Item ที่ถูกติ๊ก Checkbox (ข้ามตัวที่โดน Disable ไปแล้ว)
+    (doc.items || []).forEach((itemId, idx) => {
+        const chk = document.getElementById('return_chk_' + idx);
+        const assetNo = typeof itemId === 'object' ? itemId.assetNo : itemId;
+        if (chk) {
+            if (chk.checked && !chk.disabled) selectedToReturn.push(assetNo);
+            if (chk.disabled) alreadyReturnedCount++;
+        }
+    });
+
+    const remarks = document.getElementById('p10ModalStatusRemarks').value;
+
+    if (selectedToReturn.length === 0 && remarks === (doc.statusRemarks || '')) {
+        return alert('กรุณาติ๊กเลือกรายการที่ได้รับคืน หรือ อัปเดตหมายเหตุก่อนกดยืนยัน');
+    }
+
+    if (selectedToReturn.length > 0 && !confirm(`ยืนยันการรับคืนครุภัณฑ์จำนวน ${selectedToReturn.length} รายการ เข้าระบบคลัง?`)) return;
+
+    showSpinner(true, 'กำลังบันทึกข้อมูลการรับคืน...');
+
+    try {
+        // 1. เปลี่ยนสถานะ Asset ที่ถูกติ๊กให้กลับเป็น 'ใช้งานปกติ'
+        if (selectedToReturn.length > 0) {
+            await callGAS("updateAssetOperationalStatus", {
+                assetNoList: selectedToReturn, 
+                status: "ใช้งานปกติ", 
+                holder: "-", // ลบชื่อคนถือครองออก
+                remarks: `รับคืนจากใบ พ.10: ${doc.docNo || doc.p10running}`, 
+                imageBase64: null, fileName: '', 
+                userEmail: currentUser ? currentUser.email : "Staff"
+            });
+        }
+
+        // 2. ประเมินสถานะของใบ พ.10 ภาพรวม
+        let newReturnedCount = alreadyReturnedCount + selectedToReturn.length;
+        let newDocStatus = doc.docStatus;
+
+        if (newReturnedCount === totalItems && totalItems > 0) newDocStatus = "ส่งคืนสำเร็จ"; // คืนครบ 100%
+        else if (newReturnedCount > 0 && newReturnedCount < totalItems) newDocStatus = "ส่งคืนแล้วแต่ไม่ครบ"; // คืนแค่บางส่วน
+
+        // 3. บันทึกกลับลงเอกสาร พ.10
+        await callGAS("updateP10DocStatus", { 
+            docNo: doc.docNo || doc.p10running, docStatus: newDocStatus, statusRemarks: remarks 
+        });
+
+        showSpinner(false); playAudio('success'); alert('อัปเดตการรับคืนสำเร็จ!');
+        await loadAssetData(); 
+        openP10DetailModal(doc.docNo || doc.p10running); 
+    } catch (err) {
+        showSpinner(false); alert('เกิดข้อผิดพลาด: ' + err.message);
+    }
+}
   </script>
 </body>
 </html>
