@@ -39,34 +39,18 @@
 
   <style>
     body { font-family: 'Sarabun', sans-serif; }
-    /* ใช้ 100dvh แก้ปัญหาจอบน iOS Mobile Safari */
     body, html { height: 100dvh; width: 100vw; overflow: hidden; margin: 0; padding: 0; }
-    
-    .glass-card {
-      background: rgba(30, 41, 59, 0.65);
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .glass-input {
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.15); color: #f8fafc;
-    }
+    .glass-card { background: rgba(30, 41, 59, 0.65); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    .glass-input { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.15); color: #f8fafc; }
     .glass-input:focus { border-color: #ef4444; outline: none; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25); }
     .sidebar-transition { transition: transform 0.3s ease-in-out, width 0.3s ease-in-out; }
     .page-fade { transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out; }
-    
-    /* Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #ef4444; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
-
-    @media print {
-      body * { visibility: hidden; }
-      #printableArea, #printableArea * { visibility: visible; }
-      #printableArea { position: absolute; left: 0; top: 0; width: 100%; color: black; background: white; }
-    }
+    @media print { body * { visibility: hidden; } #printableArea, #printableArea * { visibility: visible; } #printableArea { position: absolute; left: 0; top: 0; width: 100%; color: black; background: white; } }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 antialiased selection:bg-red-600 selection:text-white">
@@ -543,23 +527,25 @@
           </div>
 
           <div class="p-3 bg-slate-900/90 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
-  <div class="flex items-center gap-2">
-    <span class="text-slate-400">แสดงหน้าละ</span>
-    <select id="statusPageSizeSelect" onchange="changeStatusPageSize()" class="px-2 py-1 rounded-lg glass-input text-xs">
-      <option value="15" selected>15</option>
-      <option value="25">25</option>
-      <option value="50">50</option>
-    </select>
-  </div>
-  <div class="flex items-center gap-3">
-    <span id="statusPaginationInfo" class="text-slate-400 font-medium hidden md:block">แสดง 0 - 0 จาก 0 รายการ</span>
-    <div class="flex items-center gap-1">
-      <button id="btnStatusPrevPage" onclick="changeStatusPage(-1)" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg disabled:opacity-40" disabled><i class="ri-arrow-left-s-line text-lg"></i></button>
-      <span id="statusPageNumberDisplay" class="px-3 py-1 bg-slate-950 rounded-lg text-white font-bold border border-slate-800">1 / 1</span>
-      <button id="btnStatusNextPage" onclick="changeStatusPage(1)" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg disabled:opacity-40" disabled><i class="ri-arrow-right-s-line text-lg"></i></button>
-    </div>
-  </div>
-</div>
+            <div class="flex items-center gap-2">
+              <span class="text-slate-400">แสดงหน้าละ</span>
+              <select id="statusPageSizeSelect" onchange="changeStatusPageSize()" class="px-2 py-1 rounded-lg glass-input text-xs">
+                <option value="15" selected>15</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+            <div class="flex items-center gap-3">
+              <span id="statusPaginationInfo" class="text-slate-400 font-medium hidden md:block">แสดง 0 - 0 จาก 0 รายการ</span>
+              <div class="flex items-center gap-1">
+                <button id="btnStatusPrevPage" onclick="changeStatusPage(-1)" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg disabled:opacity-40" disabled><i class="ri-arrow-left-s-line text-lg"></i></button>
+                <span id="statusPageNumberDisplay" class="px-3 py-1 bg-slate-950 rounded-lg text-white font-bold border border-slate-800">1 / 1</span>
+                <button id="btnStatusNextPage" onclick="changeStatusPage(1)" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg disabled:opacity-40" disabled><i class="ri-arrow-right-s-line text-lg"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div id="p10DetailModal" class="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/80 backdrop-blur-md hidden p-4">
         <div class="glass-card w-full max-w-3xl rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
@@ -715,21 +701,13 @@
   </div>
 
   <script>
-    // ==========================================
-    // 1. API & FIREBASE SETUP (GitHub Pages Ready)
-    // ==========================================
-    
-    // URL ของ Web App จาก Google Apps Script (สำคัญมาก: ห้ามมีช่องว่าง)
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyuEpb2SWcZ9QGF6FErjzPI08YzC6s6nd_pRzGFz8d1px7dHqYACJL5qgwH10sDQUIq3A/exec";
 
-    // ฟังก์ชันสำคัญสำหรับเลี่ยง CORS Preflight บน GitHub Pages
     async function callGAS(action, payload = {}) {
         const response = await fetch(GAS_API_URL, {
             method: "POST",
-            redirect: "follow", // จำเป็นสำหรับ GAS
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8", // บังคับส่งเป็น text เพื่อเลี่ยง OPTIONS Preflight
-            },
+            redirect: "follow", 
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify({ action: action, payload: payload })
         });
         const result = await response.json();
@@ -770,6 +748,20 @@
     let lastCheckedIndexTable = null;
     let lastCheckedIndexStatus = null;
 
+    let qrPrintList = [];
+    let qrCurrentPage = 1;
+    const qrPageSize = 14;
+
+    let expiredAssetsList = [];
+    let filteredExpiryAssets = []; 
+    let selectedExpiryAssets = new Set();
+    let lastCheckedIndexExpiry = null;
+    let expiryCurrentPageNum = 1;
+    let expiryPageSize = 15;
+
+    let html5QrCodeLive = null;
+    let isScanning = false;
+
     firebase.auth().onAuthStateChanged(user => {
       const loader = document.getElementById('initialAppLoader');
       if (user) {
@@ -779,21 +771,14 @@
         document.getElementById('userEmailDisplay').innerText = user.email;
         loadMasterData();
         loadAssetData();
-        
-        if (window.innerWidth < 768) {
-            switchPage('assetListView');
-        } else {
-            switchPage('dashboardView');
-        }
+        if (window.innerWidth < 768) switchPage('assetListView');
+        else switchPage('dashboardView');
       } else {
         currentUser = null;
         document.getElementById('authView').classList.remove('hidden');
         document.getElementById('mainApp').classList.add('hidden');
       }
-      if (loader) {
-        loader.classList.add('opacity-0');
-        setTimeout(() => loader.classList.add('hidden'), 300);
-      }
+      if (loader) { loader.classList.add('opacity-0'); setTimeout(() => loader.classList.add('hidden'), 300); }
     });
 
     document.getElementById('loginForm').addEventListener('submit', (e) => {
@@ -803,8 +788,7 @@
         document.getElementById('loginEmail').value,
         document.getElementById('loginPassword').value
       ).catch(err => {
-        playAudio('error');
-        alert("เข้าสู่ระบบล้มเหลว: " + err.message);
+        playAudio('error'); alert("เข้าสู่ระบบล้มเหลว: " + err.message);
       }).finally(() => showSpinner(false));
     });
 
@@ -812,13 +796,9 @@
         const pwdInput = document.getElementById('loginPassword');
         const eyeIcon = document.getElementById('eyeIcon');
         if (pwdInput.type === 'password') {
-            pwdInput.type = 'text';
-            eyeIcon.classList.replace('ri-eye-off-line', 'ri-eye-line');
-            eyeIcon.classList.add('text-red-400');
+            pwdInput.type = 'text'; eyeIcon.classList.replace('ri-eye-off-line', 'ri-eye-line'); eyeIcon.classList.add('text-red-400');
         } else {
-            pwdInput.type = 'password';
-            eyeIcon.classList.replace('ri-eye-line', 'ri-eye-off-line');
-            eyeIcon.classList.remove('text-red-400');
+            pwdInput.type = 'password'; eyeIcon.classList.replace('ri-eye-line', 'ri-eye-off-line'); eyeIcon.classList.remove('text-red-400');
         }
     }
 
@@ -857,25 +837,19 @@
 
       isSidebarCollapsed = !isSidebarCollapsed;
       if (isSidebarCollapsed) {
-        sidebar.classList.remove('w-64');
-        sidebar.classList.add('w-20');
-        container.classList.remove('md:ml-64');
-        container.classList.add('md:ml-20');
+        sidebar.classList.remove('w-64'); sidebar.classList.add('w-20');
+        container.classList.remove('md:ml-64'); container.classList.add('md:ml-20');
         icon.classList.replace('ri-menu-fold-line', 'ri-menu-unfold-line');
         texts.forEach(t => t.classList.add('hidden'));
       } else {
-        sidebar.classList.remove('w-20');
-        sidebar.classList.add('w-64');
-        container.classList.remove('md:ml-20');
-        container.classList.add('md:ml-64');
+        sidebar.classList.remove('w-20'); sidebar.classList.add('w-64');
+        container.classList.remove('md:ml-20'); container.classList.add('md:ml-64');
         icon.classList.replace('ri-menu-unfold-line', 'ri-menu-fold-line');
         texts.forEach(t => t.classList.remove('hidden'));
       }
     }
 
-    function toggleMobileSidebar() {
-      document.getElementById('sidebar').classList.toggle('-translate-x-full');
-    }
+    function toggleMobileSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
 
     function switchPage(targetPage) {
       if (currentPage === targetPage) return;
@@ -903,53 +877,32 @@
         targetEl.classList.remove('hidden');
         setTimeout(() => { targetEl.style.opacity = '1'; }, 50);
         currentPage = targetPage;
-        if (targetPage === 'assetStatusView') {
-          switchStatusTab(1);
-          loadP10DocumentsList();
-        }
+        if (targetPage === 'assetStatusView') { switchStatusTab(1); loadP10DocumentsList(); }
       }, 250);
-      if (window.innerWidth < 768) {
-        document.getElementById('sidebar').classList.add('-translate-x-full');
-      }
+      if (window.innerWidth < 768) document.getElementById('sidebar').classList.add('-translate-x-full');
     }
 
     function switchStatusTab(tabNum) {
       for (let i = 1; i <= 3; i++) {
         document.getElementById(`statusTab${i}`).classList.toggle('hidden', i !== tabNum);
         const btn = document.getElementById(`tabBtn${i}`);
-        if (i === tabNum) {
-          btn.className = "px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shrink-0 snap-start transition-all";
-        } else {
-          btn.className = "px-4 py-2 bg-slate-800 text-slate-300 hover:bg-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shrink-0 snap-start transition-all";
-        }
+        if (i === tabNum) btn.className = "px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shrink-0 snap-start transition-all";
+        else btn.className = "px-4 py-2 bg-slate-800 text-slate-300 hover:bg-slate-700 rounded-xl text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shrink-0 snap-start transition-all";
       }
       if (tabNum === 3) applyStatusFilters();
     }
 
-    // ==========================================
-    // 2. DATA LOADING & RENDERING (API FETCH)
-    // ==========================================
     async function loadAssetData() {
       try {
         const data = await callGAS("getEquipmentData");
-        assetDataCache = data;
-        filteredAssets = [...data];
-        statusFilteredAssets = [...data];
-        
-        populateAssetClassFilter(data);
-        populateQuickAssetDatalist(data);
-        renderMetrics(data);
-        renderRecentActivities(data);
+        assetDataCache = data; filteredAssets = [...data]; statusFilteredAssets = [...data];
+        populateAssetClassFilter(data); populateQuickAssetDatalist(data);
+        renderMetrics(data); renderRecentActivities(data);
         if (typeof checkExpirations === 'function') checkExpirations(data);
         applyFilters();
-        if (currentPage === 'assetStatusView') {
-          applyStatusFilters();
-          loadP10DocumentsList();
-        }
+        if (currentPage === 'assetStatusView') { applyStatusFilters(); loadP10DocumentsList(); }
         renderCharts(data);
-      } catch (err) {
-        alert("โหลดข้อมูลล้มเหลว: " + err.message);
-      }
+      } catch (err) { alert("โหลดข้อมูลล้มเหลว: " + err.message); }
     }
 
     async function loadMasterData() {
@@ -979,10 +932,8 @@
       const repairable = data.filter(i => i.current_status && i.current_status.includes('ซ่อม')).length;
       const disposed = data.filter(i => i.current_status && (i.current_status.includes('ตัดจำหน่าย') || i.current_status.includes('ตัดแล้ว'))).length;
       const normal = total - (borrowed + repairable + disposed);
-      document.getElementById('statTotal').innerText = total;
-      document.getElementById('statNormal').innerText = normal;
-      document.getElementById('statBorrowed').innerText = borrowed;
-      document.getElementById('statRepairable').innerText = repairable;
+      document.getElementById('statTotal').innerText = total; document.getElementById('statNormal').innerText = normal;
+      document.getElementById('statBorrowed').innerText = borrowed; document.getElementById('statRepairable').innerText = repairable;
       document.getElementById('statDisposed').innerText = disposed;
     }
 
@@ -1031,14 +982,14 @@
       const total = filteredAssets.length;
       if (total === 0) {
         tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-500">ไม่พบรายการ</td></tr>`;
-        updatePaginationUI(0, 0, 0, 0);
-        return;
+        updatePaginationUI(0, 0, 0, 0); return;
       }
       const totalPages = Math.ceil(total / pageSize);
       if (currentPageNum > totalPages) currentPageNum = totalPages;
       const startIndex = (currentPageNum - 1) * pageSize;
       const endIndex = Math.min(startIndex + pageSize, total);
       const pageData = filteredAssets.slice(startIndex, endIndex);
+
       pageData.forEach((item, pageIndex) => {
         const globalIndex = startIndex + pageIndex;
         const originalIndex = assetDataCache.findIndex(x => x.assetNo === item.assetNo);
@@ -1104,8 +1055,7 @@
     function updateMultiSelectBar() {
       const bar = document.getElementById('multiSelectBar');
       if (selectedAssetNos.size > 0) {
-        bar.classList.remove('hidden');
-        document.getElementById('multiSelectCount').innerText = `เลือกอยู่ ${selectedAssetNos.size} รายการ`;
+        bar.classList.remove('hidden'); document.getElementById('multiSelectCount').innerText = `เลือกอยู่ ${selectedAssetNos.size} รายการ`;
       } else {
         bar.classList.add('hidden');
       }
@@ -1127,16 +1077,12 @@
     function changePage(delta) { currentPageNum += delta; renderPaginatedTable(); }
     function changePageSize() { pageSize = parseInt(document.getElementById('pageSizeSelect').value); currentPageNum = 1; renderPaginatedTable(); }
 
-    // ==========================================
-    // 3. API ACTION FUNCTIONS
-    // ==========================================
     async function deleteSingleAsset(assetNo) {
       if (!confirm(`ต้องการลบรายการ [${assetNo}] ใช่หรือไม่?`)) return;
       showSpinner(true, 'กำลังลบ...');
       try {
         await callGAS("deleteAssetsBatch", [assetNo]);
-        showSpinner(false); playAudio('success'); alert('ลบเรียบร้อย');
-        loadAssetData();
+        showSpinner(false); playAudio('success'); alert('ลบเรียบร้อย'); loadAssetData();
       } catch (err) { showSpinner(false); alert(err.message); }
     }
 
@@ -1216,7 +1162,7 @@
       const newStatus = document.getElementById('status_newStatus').value;
       const fileInput = document.getElementById('status_attachmentFile');
       showSpinner(true, `กำลังดำเนินการ ${arr.length} รายการ...`);
-      
+
       const proceedSubmit = async (imageBase64 = null) => {
         try {
           const res = await callGAS("updateAssetOperationalStatus", {
@@ -1256,8 +1202,7 @@
       try {
         const logs = await callGAS("getAssetStatusHistory", assetNo);
         if (logs.length === 0) {
-          content.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">ไม่พบประวัติ</p>';
-          return;
+          content.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">ไม่พบประวัติ</p>'; return;
         }
         content.innerHTML = logs.map(log => `
           <div class="glass-card p-3 rounded-xl space-y-1 text-xs border border-slate-800">
@@ -1271,7 +1216,6 @@
       } catch(e) { content.innerHTML = '<p class="text-red-400">โหลดล้มเหลว</p>'; }
     }
 
-    // Modal Action Integrations
     async function updateCurrentP10Status() {
       if (!activeP10Doc) return;
       const status = document.getElementById('p10ModalNewStatus').value;
@@ -1279,8 +1223,7 @@
       showSpinner(true, 'กำลังบันทึก...');
       try {
         await callGAS("updateP10DocStatus", { docNo: activeP10Doc.docNo, docStatus: status, statusRemarks: remarks });
-        showSpinner(false);
-        playAudio('success'); alert('อัปเดตเรียบร้อย');
+        showSpinner(false); playAudio('success'); alert('อัปเดตเรียบร้อย');
         activeP10Doc.docStatus = status; openP10DetailModal(activeP10Doc.docNo); loadP10DocumentsList();
       } catch (err) { showSpinner(false); alert(err.message); }
     }
@@ -1347,6 +1290,7 @@
         if (rawJsonData.length === 0) return alert('ไม่มีข้อมูล');
         const normalizedItems = rawJsonData.map(normalizeExcelRow).filter(item => item !== null);
         if (normalizedItems.length === 0) return alert('ไม่พบข้อมูลสินทรัพย์ที่มี "เลขที่สินทรัพย์" (Asset No.) ในคอลัมน์ C');
+        
         const totalItems = normalizedItems.length;
         const chunkSize = 50;
         let successCount = 0; let failedCount = 0;
@@ -1387,49 +1331,48 @@
       } catch (err) { showSpinner(false); alert(err.message); }
     }
 
-    // ==========================================
-// อัปเกรด Live QR Scanner (สแกนเต็มจอ + ความละเอียด HD)
-// ==========================================
-function openLiveScanner() {
-    document.getElementById('liveScanOverlay').classList.remove('hidden');
-    document.getElementById('liveScanOverlay').classList.add('flex');
-    document.getElementById('fallbackCameraBtn').classList.add('hidden');
-    document.getElementById('qrScanStatusOverlay').innerText = "กำลังขออนุญาตใช้กล้อง...";
-    
-    setTimeout(() => {
-        html5QrCodeLive = new Html5Qrcode("liveScanReader");
+    function openLiveScanner() {
+        document.getElementById('liveScanOverlay').classList.remove('hidden');
+        document.getElementById('liveScanOverlay').classList.add('flex');
+        document.getElementById('fallbackCameraBtn').classList.add('hidden');
+        document.getElementById('qrScanStatusOverlay').innerText = "กำลังขออนุญาตใช้กล้อง...";
         
-        // ใช้การตั้งค่าแบบ Basic ป้องกัน OverconstrainedError (ให้เบราว์เซอร์เลือกความละเอียดที่ดีที่สุดเอง)
-        const config = { 
-            fps: 10,
-            disableFlip: false
-        };
-        
-        html5QrCodeLive.start(
-            { facingMode: "environment" }, // ขอใช้กล้องหลังแบบยืดหยุ่น
-            config,
-            (decodedText) => {
-                if(isScanning) return; 
-                isScanning = true;
-                playAudio('success');
-                addToCart(decodedText);
-                document.getElementById('qrScanStatusOverlay').innerText = "เพิ่มลงตะกร้าสำเร็จ!";
-                
-                setTimeout(() => {
-                    closeLiveScanner();
-                    isScanning = false;
-                }, 500);
-            },
-            (errorMessage) => {
-                // Ignore silent errors during scanning
-            }
-        ).catch(err => {
-            console.error("Camera Error: ", err);
-            document.getElementById('qrScanStatusOverlay').innerText = "เบราว์เซอร์บล็อกกล้อง หรือไม่รองรับ";
-            document.getElementById('fallbackCameraBtn').classList.remove('hidden');
-        });
-    }, 300);
-}
+        setTimeout(() => {
+            html5QrCodeLive = new Html5Qrcode("liveScanReader");
+            const screenMin = Math.min(window.innerWidth, window.innerHeight);
+            const qrboxSize = Math.floor(screenMin * 0.7);
+            
+            const config = { 
+                fps: 10,
+                qrbox: { width: qrboxSize, height: qrboxSize },
+                disableFlip: false
+            };
+            
+            html5QrCodeLive.start(
+                { facingMode: "environment" },
+                config,
+                (decodedText) => {
+                    if(isScanning) return; 
+                    isScanning = true;
+                    playAudio('success');
+                    addToCart(decodedText);
+                    document.getElementById('qrScanStatusOverlay').innerText = "เพิ่มลงตะกร้าสำเร็จ!";
+                    
+                    setTimeout(() => {
+                        closeLiveScanner();
+                        isScanning = false;
+                    }, 500);
+                },
+                (errorMessage) => {
+                    // Ignore silent errors during scanning
+                }
+            ).catch(err => {
+                console.error("Camera Error: ", err);
+                document.getElementById('qrScanStatusOverlay').innerText = "เบราว์เซอร์บล็อกกล้อง หรือไม่รองรับ";
+                document.getElementById('fallbackCameraBtn').classList.remove('hidden');
+            });
+        }, 300);
+    }
 
     function closeLiveScanner() {
         document.getElementById('liveScanOverlay').classList.remove('flex');
@@ -1450,9 +1393,6 @@ function openLiveScanner() {
         }).finally(() => { event.target.value = ""; });
     }
 
-    // ==========================================
-    // 5. HELPER UI FUNCTIONS
-    // ==========================================
     function addQuickInputToCart() {
       const input = document.getElementById('quickAssetInput');
       const val = input.value.trim();
@@ -1469,19 +1409,14 @@ function openLiveScanner() {
         <button onclick="cart.splice(${idx},1);renderCart();" class="text-red-400"><i class="ri-delete-bin-line"></i></button></li>`).join('');
     }
 
-    // Expiry Check System
     function parseCustomDate(str) {
-      if(!str) return null;
-      let d = new Date(str);
+      if(!str) return null; let d = new Date(str);
       if(!isNaN(d.getTime())) return d;
-      let parts = str.split('/'); if(parts.length===3) { let y=parseInt(parts[2]); if(y>2400)y-=543;
-      return new Date(y, parts[1]-1, parts[0]); } return null;
+      let parts = str.split('/'); if(parts.length===3) { let y=parseInt(parts[2]); if(y>2400)y-=543; return new Date(y, parts[1]-1, parts[0]); } return null;
     }
     function calculateRemainingLife(receivedDate, lifeYears, lifeMonths) {
-      const start = parseCustomDate(receivedDate);
-      if(!start) return { text: '-', status: 'none' };
-      const y = parseInt(lifeYears)||0, m = parseInt(lifeMonths)||0;
-      if(!y && !m) return { text: '-', status: 'none' };
+      const start = parseCustomDate(receivedDate); if(!start) return { text: '-', status: 'none' };
+      const y = parseInt(lifeYears)||0, m = parseInt(lifeMonths)||0; if(!y && !m) return { text: '-', status: 'none' };
       const exp = new Date(start); exp.setFullYear(exp.getFullYear()+y); exp.setMonth(exp.getMonth()+m);
       const diffDays = Math.ceil((exp - new Date()) / (1000*60*60*24));
       if (diffDays < 0) return { text: 'หมดอายุแล้ว', status: 'expired' };
@@ -1499,8 +1434,7 @@ function openLiveScanner() {
     function openExpiryNotifyModal() { filteredExpiryAssets = [...expiredAssetsList]; renderExpiryTable(); document.getElementById('expiryNotifyModal').classList.remove('hidden'); }
     function closeExpiryModal() { document.getElementById('expiryNotifyModal').classList.add('hidden'); }
     function renderExpiryTable() {
-       const tbody = document.getElementById('expiryListBody'); tbody.innerHTML = '';
-       document.getElementById('expiryTotalText').innerText = filteredExpiryAssets.length;
+       const tbody = document.getElementById('expiryListBody'); tbody.innerHTML = ''; document.getElementById('expiryTotalText').innerText = filteredExpiryAssets.length;
        filteredExpiryAssets.slice(0, 15).forEach((item) => {
           tbody.innerHTML += `<tr class="hover:bg-slate-900/50"><td class="p-3 text-center"><input type="checkbox" value="${item.assetNo}" class="rounded bg-slate-900 text-red-600"></td>
           <td class="p-3 font-bold text-white">${item.assetNo}</td><td class="p-3">${item.description1||'-'}</td><td class="p-3">${item.receivedDate||'-'}</td>
@@ -1508,7 +1442,6 @@ function openLiveScanner() {
        });
     }
 
-    // Modal, Wizard & Excel Parsers
     function normalizeExcelRow(row) {
       const keys = Object.keys(row);
       const cleanKeys = keys.map(k => k ? String(k).replace(/[\r\n\t]/g, '').replace(/\s+/g, ' ').trim().toLowerCase() : '');
@@ -1526,8 +1459,7 @@ function openLiveScanner() {
       let assetNo = '';
       for (let i = 0; i < keys.length; i++) {
         if (cleanKeys[i].includes('เลขที่สินทรัพย์') && !cleanKeys[i].includes('ขอสร้าง') && !cleanKeys[i].includes('ย่อย') && !cleanKeys[i].includes('เก่า')) {
-          assetNo = String(row[keys[i]]).trim();
-          break;
+          assetNo = String(row[keys[i]]).trim(); break;
         }
       }
       if (!assetNo && keys.length >= 3) assetNo = String(row[keys[2]]).trim();
@@ -1565,13 +1497,10 @@ function openLiveScanner() {
 
     function openAddAssetWizard() { isEditMode = false; document.getElementById('w_assetNo').readOnly = false; document.getElementById('wizardAssetForm').reset(); currentWizardStep = 1; updateWizardStepUI(); document.getElementById('addAssetWizardModal').classList.remove('hidden'); }
     function closeAddAssetWizard() { document.getElementById('addAssetWizardModal').classList.add('hidden'); }
-    function openBatchQrStatusModal() { document.getElementById('batchQrModal').classList.remove('hidden'); qrCurrentPage = 1;
-      qrPrintList = Array.from(selectedAssetNos).length > 0 ? Array.from(selectedAssetNos) : filteredAssets.slice(0, 28).map(i => i.assetNo); if(qrPrintList.length === 0) return alert('กรุณาเลือกรายการที่ต้องการพิมพ์ QR Code'); renderQrModalPage();
-    }
+    function openBatchQrStatusModal() { document.getElementById('batchQrModal').classList.remove('hidden'); qrCurrentPage = 1; qrPrintList = Array.from(selectedAssetNos).length > 0 ? Array.from(selectedAssetNos) : filteredAssets.slice(0, 28).map(i => i.assetNo); if(qrPrintList.length === 0) return alert('กรุณาเลือกรายการที่ต้องการพิมพ์ QR Code'); renderQrModalPage(); }
     function closeBatchQrModal() { document.getElementById('batchQrModal').classList.add('hidden'); }
     function showAssetDetail(index) {
-      const item = assetDataCache[index];
-      if (!item) return;
+      const item = assetDataCache[index]; if (!item) return;
       let lifeInfo = calculateRemainingLife(item.receivedDate, item.usefulLifeYear, item.usefulLifeMonth);
       document.getElementById('assetDetailContent').innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
@@ -1589,9 +1518,7 @@ function openLiveScanner() {
       document.getElementById('assetDetailModal').classList.remove('hidden');
     }
     function closeAssetDetail() { document.getElementById('assetDetailModal').classList.add('hidden'); }
-    function startAuditSession() { playAudio('success'); document.getElementById('auditResultsArea').classList.remove('hidden');
-      document.getElementById('auditLogList').innerHTML = `<div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"><i class="ri-checkbox-circle-line me-1"></i> เริ่มต้นรอบการตรวจนับสต็อกสำเร็จ! พร้อมสแกน QR Code ตรวจนับ</div>`;
-    }
+    function startAuditSession() { playAudio('success'); document.getElementById('auditResultsArea').classList.remove('hidden'); document.getElementById('auditLogList').innerHTML = `<div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"><i class="ri-checkbox-circle-line me-1"></i> เริ่มต้นรอบการตรวจนับสต็อกสำเร็จ! พร้อมสแกน QR Code ตรวจนับ</div>`; }
     function filterP10DocsTable() {
       const statusFilter = document.getElementById('filterP10DocStatus').value;
       const tbody = document.getElementById('p10DocsTableBody');
@@ -1638,378 +1565,371 @@ function openLiveScanner() {
       statusCurrentPageNum = 1;
       renderStatusPaginatedTable();
     }
-    // ==========================================
-// ส่วนที่ขาดหายไป: จัดการระบบพิมพ์ QR Code และ Export Excel
-// ==========================================
-
-let qrPrintList = [];
-let qrCurrentPage = 1;
-const qrPageSize = 14;
-
-function changeQrPage(delta) {
-  qrCurrentPage += delta;
-  renderQrModalPage();
-}
-
-function truncateText(text, maxLength) {
-    if (!text) return '-';
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
-}
-
-function renderQrModalPage() {
-  const grid = document.getElementById('qrStatusTagGrid');
-  if (!grid) return;
-  grid.innerHTML = '';
-  
-  const total = qrPrintList.length;
-  const totalPages = Math.ceil(total / qrPageSize);
-  if (qrCurrentPage > totalPages) qrCurrentPage = totalPages;
-  if (qrCurrentPage < 1) qrCurrentPage = 1;
-
-  const start = (qrCurrentPage - 1) * qrPageSize;
-  const end = Math.min(start + qrPageSize, total);
-  const pageItems = qrPrintList.slice(start, end);
-
-  document.getElementById('qrPaginationInfo').innerText = `แสดง ${start + 1} - ${end} จาก ${total} รายการ`;
-  document.getElementById('qrPageDisplay').innerText = `${qrCurrentPage} / ${totalPages || 1}`;
-  document.getElementById('btnQrPrev').disabled = (qrCurrentPage <= 1);
-  document.getElementById('btnQrNext').disabled = (qrCurrentPage >= totalPages || totalPages === 0);
-  
-  pageItems.forEach(assetNo => {
-    const item = assetDataCache.find(x => x.assetNo === assetNo) || { assetNo: assetNo };
-    const tagId = 'qr_tag_' + assetNo.replace(/[^a-zA-Z0-9]/g, '');
     
-    let rcvDate = '-';
-    if (item.receivedDate) {
-      const d = new Date(item.receivedDate);
-      rcvDate = isNaN(d.getTime()) ? item.receivedDate : d.toLocaleDateString('th-TH');
+    function changeQrPage(delta) {
+      qrCurrentPage += delta;
+      renderQrModalPage();
     }
 
-    const displaySubClass = truncateText(item.subClass, 45);
-    const displayDesc = truncateText(item.description1, 60);
+    function truncateText(text, maxLength) {
+        if (!text) return '-';
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
+    }
 
-    grid.innerHTML += `
-      <div class="border-2 border-slate-300 p-3 rounded-xl flex items-center gap-4 bg-white text-black shadow-sm min-h-[120px] h-full">
-        <div id="${tagId}" class="p-1 bg-white border border-slate-200 rounded-lg shrink-0 w-[90px] h-[90px] flex items-center justify-center overflow-hidden"></div>
-        <div class="overflow-hidden flex-1 flex flex-col justify-center space-y-1">
-          <p class="font-bold text-[15px] leading-snug text-black">${item.assetNo}</p>
-          <p class="text-[11px] leading-snug text-slate-700">${displaySubClass}</p>
-          <p class="text-[11px] leading-snug text-slate-700"><span class="font-semibold text-slate-900">รับ:</span> ${rcvDate}</p>
-          <p class="text-[11px] leading-snug text-slate-700" title="${item.description1 || ''}">${displayDesc}</p>
-        </div>
-      </div>
-    `;
-    
-    setTimeout(() => {
-      const qrContainer = document.getElementById(tagId);
-      if (qrContainer) {
-        qrContainer.innerHTML = '';
-        new QRCode(qrContainer, { text: item.assetNo, width: 80, height: 80, correctLevel: QRCode.CorrectLevel.M });
-        const canvas = qrContainer.querySelector('canvas');
-        if(canvas) canvas.style.cssText = 'max-width: 100% !important; height: auto !important; margin: auto; display: block;';
+    function renderQrModalPage() {
+      const grid = document.getElementById('qrStatusTagGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      
+      const total = qrPrintList.length;
+      const totalPages = Math.ceil(total / qrPageSize);
+      if (qrCurrentPage > totalPages) qrCurrentPage = totalPages;
+      if (qrCurrentPage < 1) qrCurrentPage = 1;
+
+      const start = (qrCurrentPage - 1) * qrPageSize;
+      const end = Math.min(start + qrPageSize, total);
+      const pageItems = qrPrintList.slice(start, end);
+
+      document.getElementById('qrPaginationInfo').innerText = `แสดง ${start + 1} - ${end} จาก ${total} รายการ`;
+      document.getElementById('qrPageDisplay').innerText = `${qrCurrentPage} / ${totalPages || 1}`;
+      document.getElementById('btnQrPrev').disabled = (qrCurrentPage <= 1);
+      document.getElementById('btnQrNext').disabled = (qrCurrentPage >= totalPages || totalPages === 0);
+      
+      pageItems.forEach(assetNo => {
+        const item = assetDataCache.find(x => x.assetNo === assetNo) || { assetNo: assetNo };
+        const tagId = 'qr_tag_' + assetNo.replace(/[^a-zA-Z0-9]/g, '');
+        
+        let rcvDate = '-';
+        if (item.receivedDate) {
+          const d = new Date(item.receivedDate);
+          rcvDate = isNaN(d.getTime()) ? item.receivedDate : d.toLocaleDateString('th-TH');
+        }
+
+        const displaySubClass = truncateText(item.subClass, 45);
+        const displayDesc = truncateText(item.description1, 60);
+
+        grid.innerHTML += `
+          <div class="border-2 border-slate-300 p-3 rounded-xl flex items-center gap-4 bg-white text-black shadow-sm min-h-[120px] h-full">
+            <div id="${tagId}" class="p-1 bg-white border border-slate-200 rounded-lg shrink-0 w-[90px] h-[90px] flex items-center justify-center overflow-hidden"></div>
+            <div class="overflow-hidden flex-1 flex flex-col justify-center space-y-1">
+              <p class="font-bold text-[15px] leading-snug text-black">${item.assetNo}</p>
+              <p class="text-[11px] leading-snug text-slate-700">${displaySubClass}</p>
+              <p class="text-[11px] leading-snug text-slate-700"><span class="font-semibold text-slate-900">รับ:</span> ${rcvDate}</p>
+              <p class="text-[11px] leading-snug text-slate-700" title="${item.description1 || ''}">${displayDesc}</p>
+            </div>
+          </div>
+        `;
+        
+        setTimeout(() => {
+          const qrContainer = document.getElementById(tagId);
+          if (qrContainer) {
+            qrContainer.innerHTML = '';
+            new QRCode(qrContainer, { text: item.assetNo, width: 80, height: 80, correctLevel: QRCode.CorrectLevel.M });
+            const canvas = qrContainer.querySelector('canvas');
+            if(canvas) canvas.style.cssText = 'max-width: 100% !important; height: auto !important; margin: auto; display: block;';
+          }
+        }, 50);
+      });
+    }
+
+    async function downloadAllQrPdf() {
+      const totalItems = qrPrintList.length;
+      if (totalItems === 0) return alert('ไม่มีรายการให้ดาวน์โหลด');
+      
+      const spinnerOverlay = document.getElementById('loadingOverlay');
+      if (spinnerOverlay) spinnerOverlay.style.zIndex = '9999';
+      
+      showSpinner(true, 'กำลังเตรียมโครงสร้างเอกสาร PDF...', { current: 0, total: totalItems });
+      
+      const printArea = document.getElementById('printableArea');
+      printArea.classList.remove('hidden');
+      printArea.style.position = 'fixed';
+      printArea.style.top = '0';
+      printArea.style.left = '0';
+      printArea.style.zIndex = '40';
+      printArea.style.background = 'white';
+      printArea.style.height = '100vh';
+      printArea.style.width = '100vw';
+      printArea.style.overflow = 'hidden';
+      
+      let htmlString = `<div id="pdfExportArea" style="width: 210mm; background: white; color: black; font-family: 'Sarabun', sans-serif;">`;
+      
+      for (let i = 0; i < totalItems; i += qrPageSize) {
+        const isLastPage = (i + qrPageSize) >= totalItems;
+        const pageBreakStyle = isLastPage ? '' : 'page-break-after: always;';
+        
+        htmlString += `
+          <div style="width: 210mm; padding: 10mm; box-sizing: border-box; background: white; ${pageBreakStyle}">
+            <h2 style="text-align: center; margin-bottom: 20px; font-weight: bold; font-size: 16px;">ป้าย QR Code ครุภัณฑ์ (หน้า ${Math.floor(i / qrPageSize) + 1})</h2>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+        `;
+        
+        const chunk = qrPrintList.slice(i, i + qrPageSize);
+        chunk.forEach(assetNo => {
+           const item = assetDataCache.find(x => x.assetNo === assetNo) || { assetNo: assetNo };
+           let rcvDate = item.receivedDate ? (!isNaN(new Date(item.receivedDate).getTime()) ? new Date(item.receivedDate).toLocaleDateString('th-TH') : item.receivedDate) : '-';
+           const tagId = 'pdf_qr_' + assetNo.replace(/[^a-zA-Z0-9]/g, '');
+           const displaySubClass = truncateText(item.subClass, 45);
+           const displayDesc = truncateText(item.description1, 60);
+           
+           htmlString += `
+             <div style="border: 2px solid #cbd5e1; padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 15px; height: 130px; background: white; page-break-inside: avoid; overflow: hidden;">
+               <div id="${tagId}" style="width: 90px; height: 90px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;"></div>
+               <div style="flex: 1; overflow: hidden; display: flex; flex-direction: column; justify-content: center;">
+                 <p style="font-weight: bold; font-size: 16px; margin: 0 0 5px 0; line-height: 1;">${item.assetNo}</p>
+                 <p style="font-size: 12px; margin: 0 0 4px 0; line-height: 1.3; color: #334155;">${displaySubClass}</p>
+                 <p style="font-size: 12px; margin: 0 0 4px 0; line-height: 1.3; color: #334155;"><strong>รับ:</strong> ${rcvDate}</p>
+                 <p style="font-size: 12px; margin: 0; line-height: 1.4; color: #334155;">${displayDesc}</p>
+               </div>
+             </div>
+           `;
+        });
+        htmlString += `</div></div>`;
       }
-    }, 50);
-  });
-}
+      htmlString += `</div>`;
+      printArea.innerHTML = htmlString;
 
-async function downloadAllQrPdf() {
-  const totalItems = qrPrintList.length;
-  if (totalItems === 0) return alert('ไม่มีรายการให้ดาวน์โหลด');
-  
-  const spinnerOverlay = document.getElementById('loadingOverlay');
-  if (spinnerOverlay) spinnerOverlay.style.zIndex = '9999';
-  
-  showSpinner(true, 'กำลังเตรียมโครงสร้างเอกสาร PDF...', { current: 0, total: totalItems });
-  
-  const printArea = document.getElementById('printableArea');
-  printArea.classList.remove('hidden');
-  printArea.style.position = 'fixed';
-  printArea.style.top = '0';
-  printArea.style.left = '0';
-  printArea.style.zIndex = '40';
-  printArea.style.background = 'white';
-  printArea.style.height = '100vh';
-  printArea.style.width = '100vw';
-  printArea.style.overflow = 'hidden';
-  
-  let htmlString = `<div id="pdfExportArea" style="width: 210mm; background: white; color: black; font-family: 'Sarabun', sans-serif;">`;
-  
-  for (let i = 0; i < totalItems; i += qrPageSize) {
-    const isLastPage = (i + qrPageSize) >= totalItems;
-    const pageBreakStyle = isLastPage ? '' : 'page-break-after: always;';
+      for(let i = 0; i < totalItems; i++) {
+         const assetNo = qrPrintList[i];
+         const tagId = 'pdf_qr_' + assetNo.replace(/[^a-zA-Z0-9]/g, '');
+         const container = document.getElementById(tagId);
+         
+         if(container) {
+            new QRCode(container, { text: assetNo, width: 80, height: 80, correctLevel: QRCode.CorrectLevel.M });
+            const cvs = container.querySelector('canvas');
+            const img = container.querySelector('img');
+            if (cvs && img) {
+               img.src = cvs.toDataURL('image/png');
+               img.style.display = 'block';
+               img.style.margin = 'auto';
+               cvs.style.display = 'none';
+            }
+            if (i % 3 === 0 || i === totalItems - 1) {
+              showSpinner(true, 'กำลังสร้างรูป QR Code...', { current: i + 1, total: totalItems });
+              await new Promise(r => setTimeout(r, 15)); 
+            }
+         }
+      }
+
+      showSpinner(true, 'กำลังแปลงไฟล์เป็น PDF...', { current: totalItems, total: totalItems });
+      await new Promise(r => setTimeout(r, 1000)); 
+
+      const element = document.getElementById('pdfExportArea');
+      const opt = {
+        margin:       0,
+        filename:     `EMS_QRCode_${new Date().toISOString().slice(0,10)}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      
+      try {
+        await html2pdf().set(opt).from(element).save();
+      } catch (err) {
+        alert('เกิดข้อผิดพลาดในการสร้าง PDF: ' + err.message);
+      } finally {
+        printArea.innerHTML = '';
+        printArea.classList.add('hidden');
+        printArea.removeAttribute('style');
+        if (spinnerOverlay) spinnerOverlay.style.zIndex = '150'; 
+        showSpinner(false);
+        playAudio('success');
+      }
+    }
+
+    function exportFilteredAssetsExcel() {
+      if (filteredAssets.length === 0) return alert('ไม่มีข้อมูลสำหรับ Export');
+      showSpinner(true, 'กำลังส่งออกไฟล์ Excel...');
+      setTimeout(() => {
+        const exportData = filteredAssets.map(item => ({
+          "เลขที่สินทรัพย์ (Asset No.)": item.assetNo || '',
+          "ประเภทสินทรัพย์ (Asset Class)": item.assetClass || '',
+          "คำอธิบายสินทรัพย์ 1": item.description1 || '',
+          "คำอธิบายสินทรัพย์ 2": item.description2 || '',
+          "ศูนย์ต้นทุน": item.costCenter || '',
+          "สถานะปฏิบัติงาน": item.current_status || '',
+          "ผู้ถือครองปัจจุบัน": item.current_holder || '',
+          "มูลค่าสินทรัพย์": item.assetValue || '',
+          "มูลค่าคงเหลือตามบัญชี": item.bookValue || '',
+          "ชื่อผู้ขาย (Vendor)": item.vendor || '',
+          "หมายเหตุ": item.remarks || ''
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Assets_Export");
+        XLSX.writeFile(wb, `EMS_Asset_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
+        showSpinner(false);
+        playAudio('success');
+      }, 300);
+    }
     
-    htmlString += `
-      <div style="width: 210mm; padding: 10mm; box-sizing: border-box; background: white; ${pageBreakStyle}">
-        <h2 style="text-align: center; margin-bottom: 20px; font-weight: bold; font-size: 16px;">ป้าย QR Code ครุภัณฑ์ (หน้า ${Math.floor(i / qrPageSize) + 1})</h2>
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-    `;
-    
-    const chunk = qrPrintList.slice(i, i + qrPageSize);
-    chunk.forEach(assetNo => {
-       const item = assetDataCache.find(x => x.assetNo === assetNo) || { assetNo: assetNo };
-       let rcvDate = item.receivedDate ? (!isNaN(new Date(item.receivedDate).getTime()) ? new Date(item.receivedDate).toLocaleDateString('th-TH') : item.receivedDate) : '-';
-       const tagId = 'pdf_qr_' + assetNo.replace(/[^a-zA-Z0-9]/g, '');
-       const displaySubClass = truncateText(item.subClass, 45);
-       const displayDesc = truncateText(item.description1, 60);
-       
-       htmlString += `
-         <div style="border: 2px solid #cbd5e1; padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 15px; height: 130px; background: white; page-break-inside: avoid; overflow: hidden;">
-           <div id="${tagId}" style="width: 90px; height: 90px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;"></div>
-           <div style="flex: 1; overflow: hidden; display: flex; flex-direction: column; justify-content: center;">
-             <p style="font-weight: bold; font-size: 16px; margin: 0 0 5px 0; line-height: 1;">${item.assetNo}</p>
-             <p style="font-size: 12px; margin: 0 0 4px 0; line-height: 1.3; color: #334155;">${displaySubClass}</p>
-             <p style="font-size: 12px; margin: 0 0 4px 0; line-height: 1.3; color: #334155;"><strong>รับ:</strong> ${rcvDate}</p>
-             <p style="font-size: 12px; margin: 0; line-height: 1.4; color: #334155;">${displayDesc}</p>
-           </div>
-         </div>
-       `;
-    });
-    htmlString += `</div></div>`;
-  }
-  htmlString += `</div>`;
-  printArea.innerHTML = htmlString;
-
-  for(let i = 0; i < totalItems; i++) {
-     const assetNo = qrPrintList[i];
-     const tagId = 'pdf_qr_' + assetNo.replace(/[^a-zA-Z0-9]/g, '');
-     const container = document.getElementById(tagId);
-     
-     if(container) {
-        new QRCode(container, { text: assetNo, width: 80, height: 80, correctLevel: QRCode.CorrectLevel.M });
-        const cvs = container.querySelector('canvas');
-        const img = container.querySelector('img');
-        if (cvs && img) {
-           img.src = cvs.toDataURL('image/png');
-           img.style.display = 'block';
-           img.style.margin = 'auto';
-           cvs.style.display = 'none';
-        }
-        if (i % 3 === 0 || i === totalItems - 1) {
-          showSpinner(true, 'กำลังสร้างรูป QR Code...', { current: i + 1, total: totalItems });
-          await new Promise(r => setTimeout(r, 15)); 
-        }
-     }
-  }
-
-  showSpinner(true, 'กำลังแปลงไฟล์เป็น PDF...', { current: totalItems, total: totalItems });
-  await new Promise(r => setTimeout(r, 1000)); 
-
-  const element = document.getElementById('pdfExportArea');
-  const opt = {
-    margin:       0,
-    filename:     `EMS_QRCode_${new Date().toISOString().slice(0,10)}.pdf`,
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-  
-  try {
-    await html2pdf().set(opt).from(element).save();
-  } catch (err) {
-    alert('เกิดข้อผิดพลาดในการสร้าง PDF: ' + err.message);
-  } finally {
-    printArea.innerHTML = '';
-    printArea.classList.add('hidden');
-    printArea.removeAttribute('style');
-    if (spinnerOverlay) spinnerOverlay.style.zIndex = '150'; 
-    showSpinner(false);
-    playAudio('success');
-  }
-}
-
-function exportFilteredAssetsExcel() {
-  if (filteredAssets.length === 0) return alert('ไม่มีข้อมูลสำหรับ Export');
-  showSpinner(true, 'กำลังส่งออกไฟล์ Excel...');
-  setTimeout(() => {
-    const exportData = filteredAssets.map(item => ({
-      "เลขที่สินทรัพย์ (Asset No.)": item.assetNo || '',
-      "ประเภทสินทรัพย์ (Asset Class)": item.assetClass || '',
-      "คำอธิบายสินทรัพย์ 1": item.description1 || '',
-      "คำอธิบายสินทรัพย์ 2": item.description2 || '',
-      "ศูนย์ต้นทุน": item.costCenter || '',
-      "สถานะปฏิบัติงาน": item.current_status || '',
-      "ผู้ถือครองปัจจุบัน": item.current_holder || '',
-      "มูลค่าสินทรัพย์": item.assetValue || '',
-      "มูลค่าคงเหลือตามบัญชี": item.bookValue || '',
-      "ชื่อผู้ขาย (Vendor)": item.vendor || '',
-      "หมายเหตุ": item.remarks || ''
-    }));
-
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Assets_Export");
-    XLSX.writeFile(wb, `EMS_Asset_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
-    showSpinner(false);
-    playAudio('success');
-  }, 300);
-}
     function downloadTemplate() {
-  const headers = [[
-    "preAssetNo", "assetNo", "assetSubNo", "assetClass", "subClass", 
-    "description1", "description2", "serialNumber", "inventoryNumber", "quantity", 
-    "unit", "assetValue", "bookValue", "costCenter", "respCostCenter", 
-    "borrowingAgency", "oldBudgetCode", "functionalArea", "fundCenter", 
-    "licensePlateNo", "source", "assetSuperNo", "vendor", "manufacturer", 
-    "usefulLifeYear", "usefulLifeMonth", "poNo", "purchasingAgency", 
-    "createdAssetDate", "receivedDate", "transferredDate", "disposedDate", 
-    "replacementStatus", "replacementNote1", "replacementNote2", "receiptStatus", 
-    "confirmedDate", "inReqProcess"
-  ]];
-  const ws = XLSX.utils.aoa_to_sheet(headers);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Asset_Template");
-  XLSX.writeFile(wb, "Full_Asset_Import_Template.xlsx");
-}
+      const headers = [[
+        "preAssetNo", "assetNo", "assetSubNo", "assetClass", "subClass", 
+        "description1", "description2", "serialNumber", "inventoryNumber", "quantity", 
+        "unit", "assetValue", "bookValue", "costCenter", "respCostCenter", 
+        "borrowingAgency", "oldBudgetCode", "functionalArea", "fundCenter", 
+        "licensePlateNo", "source", "assetSuperNo", "vendor", "manufacturer", 
+        "usefulLifeYear", "usefulLifeMonth", "poNo", "purchasingAgency", 
+        "createdAssetDate", "receivedDate", "transferredDate", "disposedDate", 
+        "replacementStatus", "replacementNote1", "replacementNote2", "receiptStatus", 
+        "confirmedDate", "inReqProcess"
+      ]];
+      const ws = XLSX.utils.aoa_to_sheet(headers);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Asset_Template");
+      XLSX.writeFile(wb, "Full_Asset_Import_Template.xlsx");
+    }
+
     function printQrStatusTags() {
-  const printArea = document.getElementById('printableArea');
-  const originalGrid = document.getElementById('qrStatusTagGrid');
-  
-  printArea.innerHTML = `
-    <div style="width: 210mm; margin: 0 auto; background: white; color: black; font-family: 'Sarabun', sans-serif;">
-      <h2 style="text-align: center; margin-bottom: 20px; font-weight: bold; font-size: 16px;">ป้าย QR Code ครุภัณฑ์</h2>
-      <div id="printQrGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;"></div>
-    </div>
-  `;
-  
-  const printGrid = document.getElementById('printQrGrid');
-  
-  Array.from(originalGrid.children).forEach((card) => {
-    const clone = card.cloneNode(true);
-    clone.removeAttribute('id');
-    const qrContainer = clone.querySelector('div[id^="qr_tag_"]');
-    if (qrContainer) qrContainer.removeAttribute('id');
-    
-    const canvas = clone.querySelector('canvas');
-    const img = clone.querySelector('img');
-    if (canvas) {
-      if (!img.src) img.src = canvas.toDataURL("image/png");
-      img.style.display = 'block';
-      img.style.width = '100%';
-      canvas.style.display = 'none';
+      const printArea = document.getElementById('printableArea');
+      const originalGrid = document.getElementById('qrStatusTagGrid');
+      
+      printArea.innerHTML = `
+        <div style="width: 210mm; margin: 0 auto; background: white; color: black; font-family: 'Sarabun', sans-serif;">
+          <h2 style="text-align: center; margin-bottom: 20px; font-weight: bold; font-size: 16px;">ป้าย QR Code ครุภัณฑ์</h2>
+          <div id="printQrGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;"></div>
+        </div>
+      `;
+      
+      const printGrid = document.getElementById('printQrGrid');
+      
+      Array.from(originalGrid.children).forEach((card) => {
+        const clone = card.cloneNode(true);
+        clone.removeAttribute('id');
+        const qrContainer = clone.querySelector('div[id^="qr_tag_"]');
+        if (qrContainer) qrContainer.removeAttribute('id');
+        
+        const canvas = clone.querySelector('canvas');
+        const img = clone.querySelector('img');
+        if (canvas) {
+          if (!img.src) img.src = canvas.toDataURL("image/png");
+          img.style.display = 'block';
+          img.style.width = '100%';
+          canvas.style.display = 'none';
+        }
+        
+        clone.style.border = '1px solid #cbd5e1';
+        clone.style.pageBreakInside = 'avoid';
+        clone.style.breakInside = 'avoid';
+        
+        printGrid.appendChild(clone);
+      });
+      
+      document.getElementById('mainApp').classList.add('hidden');
+      document.getElementById('batchQrModal').classList.add('hidden');
+      printArea.classList.remove('hidden');
+      
+      window.onafterprint = function() {
+        document.getElementById('mainApp').classList.remove('hidden');
+        document.getElementById('batchQrModal').classList.remove('hidden');
+        printArea.classList.add('hidden');
+        printArea.innerHTML = '';
+        window.onafterprint = null;
+      };
+
+      setTimeout(() => {
+        window.print();
+      }, 500);
     }
-    
-    clone.style.border = '1px solid #cbd5e1';
-    clone.style.pageBreakInside = 'avoid';
-    clone.style.breakInside = 'avoid';
-    
-    printGrid.appendChild(clone);
-  });
-  
-  document.getElementById('mainApp').classList.add('hidden');
-  document.getElementById('batchQrModal').classList.add('hidden');
-  printArea.classList.remove('hidden');
-  
-  window.onafterprint = function() {
-    document.getElementById('mainApp').classList.remove('hidden');
-    document.getElementById('batchQrModal').classList.remove('hidden');
-    printArea.classList.add('hidden');
-    printArea.innerHTML = '';
-    window.onafterprint = null;
-  };
 
-  setTimeout(() => {
-    window.print();
-  }, 500);
-}
-  // ==========================================
-// ส่วนที่ขาดหายไป: ฟังก์ชันสำหรับจัดการตารางหน้า "ปรับสถานะ" (Tab 3)
-// ==========================================
-function renderStatusPaginatedTable() {
-  const tbody = document.getElementById('statusTableBody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
+    function renderStatusPaginatedTable() {
+      const tbody = document.getElementById('statusTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
 
-  const total = statusFilteredAssets.length;
-  if (total === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">ไม่พบรายการครุภัณฑ์</td></tr>`;
-    updateStatusPaginationUI(0, 0, 0, 0);
-    return;
-  }
+      const total = statusFilteredAssets.length;
+      if (total === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">ไม่พบรายการครุภัณฑ์</td></tr>`;
+        updateStatusPaginationUI(0, 0, 0, 0);
+        return;
+      }
 
-  const totalPages = Math.ceil(total / statusPageSize);
-  if (statusCurrentPageNum > totalPages) statusCurrentPageNum = totalPages;
+      const totalPages = Math.ceil(total / statusPageSize);
+      if (statusCurrentPageNum > totalPages) statusCurrentPageNum = totalPages;
 
-  const startIndex = (statusCurrentPageNum - 1) * statusPageSize;
-  const endIndex = Math.min(startIndex + statusPageSize, total);
-  const pageData = statusFilteredAssets.slice(startIndex, endIndex);
+      const startIndex = (statusCurrentPageNum - 1) * statusPageSize;
+      const endIndex = Math.min(startIndex + statusPageSize, total);
+      const pageData = statusFilteredAssets.slice(startIndex, endIndex);
 
-  pageData.forEach((item, pageIndex) => {
-    const globalIndex = startIndex + pageIndex;
-    const isChecked = statusSelectedAssetNos.has(item.assetNo);
+      pageData.forEach((item, pageIndex) => {
+        const globalIndex = startIndex + pageIndex;
+        const isChecked = statusSelectedAssetNos.has(item.assetNo);
 
-    const imageLinkBtn = item.attachmentUrl 
-      ? `<a href="${item.attachmentUrl}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40 rounded-xl text-[10px] font-semibold transition-colors"><i class="ri-folder-image-fill text-sm"></i> เปิดอัลบั้ม</a>` 
-      : `<span class="text-slate-600 text-[10px]">- ไม่มีรูป -</span>`;
+        const imageLinkBtn = item.attachmentUrl 
+          ? `<a href="${item.attachmentUrl}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40 rounded-xl text-[10px] font-semibold transition-colors"><i class="ri-folder-image-fill text-sm"></i> เปิดอัลบั้ม</a>` 
+          : `<span class="text-slate-600 text-[10px]">- ไม่มีรูป -</span>`;
 
-    tbody.innerHTML += `
-      <tr class="hover:bg-slate-900/50 transition-colors ${isChecked ? 'bg-red-950/20' : ''}">
-        <td class="p-3.5 text-center">
-          <input type="checkbox" value="${item.assetNo}" data-index="${globalIndex}" ${isChecked ? 'checked' : ''} onclick="handleStatusCheckboxClick(event, this)" class="rounded bg-slate-900 border-slate-700 text-red-600">
-        </td>
-        <td class="p-3.5 font-bold text-white">${item.assetNo || ''}</td>
-        <td class="p-3.5 text-slate-200">${item.description1 || ''}</td>
-        <td class="p-3.5"><span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-200 border border-slate-700">${item.current_status || 'ใช้งานปกติ'}</span></td>
-        <td class="p-3.5 text-slate-400">${item.current_holder || '-'}</td>
-        <td class="p-3.5 text-center">${imageLinkBtn}</td>
-        <td class="p-3.5 text-right">
-          <button onclick="viewStatusAuditLog('${item.assetNo}')" class="px-2.5 py-1 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-lg text-[10px] font-semibold flex items-center gap-1 ms-auto">
-            <i class="ri-history-line"></i> ประวัติ Log
-          </button>
-        </td>
-      </tr>
-    `;
-  });
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-900/50 transition-colors ${isChecked ? 'bg-red-950/20' : ''}">
+            <td class="p-3.5 text-center">
+              <input type="checkbox" value="${item.assetNo}" data-index="${globalIndex}" ${isChecked ? 'checked' : ''} onclick="handleStatusCheckboxClick(event, this)" class="rounded bg-slate-900 border-slate-700 text-red-600">
+            </td>
+            <td class="p-3.5 font-bold text-white">${item.assetNo || ''}</td>
+            <td class="p-3.5 text-slate-200">${item.description1 || ''}</td>
+            <td class="p-3.5"><span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-200 border border-slate-700">${item.current_status || 'ใช้งานปกติ'}</span></td>
+            <td class="p-3.5 text-slate-400">${item.current_holder || '-'}</td>
+            <td class="p-3.5 text-center">${imageLinkBtn}</td>
+            <td class="p-3.5 text-right">
+              <button onclick="viewStatusAuditLog('${item.assetNo}')" class="px-2.5 py-1 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-lg text-[10px] font-semibold flex items-center gap-1 ms-auto">
+                <i class="ri-history-line"></i> ประวัติ Log
+              </button>
+            </td>
+          </tr>
+        `;
+      });
 
-  updateStatusPaginationUI(startIndex + 1, endIndex, total, totalPages);
-  document.getElementById('statusSelectCount').innerText = `เลือกอยู่ ${statusSelectedAssetNos.size} รายการ`;
-}
-
-function handleStatusCheckboxClick(e, chk) {
-  const currentIndex = parseInt(chk.getAttribute('data-index'));
-  const assetNo = chk.value;
-
-  if (e.shiftKey && lastCheckedIndexStatus !== null) {
-    const start = Math.min(lastCheckedIndexStatus, currentIndex);
-    const end = Math.max(lastCheckedIndexStatus, currentIndex);
-    for (let i = start; i <= end; i++) {
-      if (statusFilteredAssets[i]) statusSelectedAssetNos.add(statusFilteredAssets[i].assetNo);
+      updateStatusPaginationUI(startIndex + 1, endIndex, total, totalPages);
+      document.getElementById('statusSelectCount').innerText = `เลือกอยู่ ${statusSelectedAssetNos.size} รายการ`;
     }
-  } else {
-    if (chk.checked) statusSelectedAssetNos.add(assetNo);
-    else statusSelectedAssetNos.delete(assetNo);
-  }
 
-  lastCheckedIndexStatus = currentIndex;
-  renderStatusPaginatedTable();
-}
+    function handleStatusCheckboxClick(e, chk) {
+      const currentIndex = parseInt(chk.getAttribute('data-index'));
+      const assetNo = chk.value;
 
-function toggleSelectAllStatus(selectAllChk) {
-  if (selectAllChk.checked) {
-    statusFilteredAssets.forEach(item => statusSelectedAssetNos.add(item.assetNo));
-  } else {
-    statusSelectedAssetNos.clear();
-  }
-  renderStatusPaginatedTable();
-}
+      if (e.shiftKey && lastCheckedIndexStatus !== null) {
+        const start = Math.min(lastCheckedIndexStatus, currentIndex);
+        const end = Math.max(lastCheckedIndexStatus, currentIndex);
+        for (let i = start; i <= end; i++) {
+          if (statusFilteredAssets[i]) statusSelectedAssetNos.add(statusFilteredAssets[i].assetNo);
+        }
+      } else {
+        if (chk.checked) statusSelectedAssetNos.add(assetNo);
+        else statusSelectedAssetNos.delete(assetNo);
+      }
 
-function updateStatusPaginationUI(start, end, total, totalPages) {
-  document.getElementById('statusPaginationInfo').innerText = `แสดง ${start} - ${end} จาก ${total} รายการ`;
-  document.getElementById('statusPageNumberDisplay').innerText = `${statusCurrentPageNum} / ${totalPages || 1}`;
-  document.getElementById('btnStatusPrevPage').disabled = (statusCurrentPageNum <= 1);
-  document.getElementById('btnStatusNextPage').disabled = (statusCurrentPageNum >= totalPages || totalPages === 0);
-}
+      lastCheckedIndexStatus = currentIndex;
+      renderStatusPaginatedTable();
+    }
 
-function changeStatusPage(delta) {
-  statusCurrentPageNum += delta;
-  renderStatusPaginatedTable();
-}
+    function toggleSelectAllStatus(selectAllChk) {
+      if (selectAllChk.checked) {
+        statusFilteredAssets.forEach(item => statusSelectedAssetNos.add(item.assetNo));
+      } else {
+        statusSelectedAssetNos.clear();
+      }
+      renderStatusPaginatedTable();
+    }
 
-function changeStatusPageSize() {
-  statusPageSize = parseInt(document.getElementById('statusPageSizeSelect').value);
-  statusCurrentPageNum = 1;
-  renderStatusPaginatedTable();
-}  
+    function updateStatusPaginationUI(start, end, total, totalPages) {
+      document.getElementById('statusPaginationInfo').innerText = `แสดง ${start} - ${end} จาก ${total} รายการ`;
+      document.getElementById('statusPageNumberDisplay').innerText = `${statusCurrentPageNum} / ${totalPages || 1}`;
+      document.getElementById('btnStatusPrevPage').disabled = (statusCurrentPageNum <= 1);
+      document.getElementById('btnStatusNextPage').disabled = (statusCurrentPageNum >= totalPages || totalPages === 0);
+    }
+
+    function changeStatusPage(delta) {
+      statusCurrentPageNum += delta;
+      renderStatusPaginatedTable();
+    }
+
+    function changeStatusPageSize() {
+      statusPageSize = parseInt(document.getElementById('statusPageSizeSelect').value);
+      statusCurrentPageNum = 1;
+      renderStatusPaginatedTable();
+    }  
   </script>
 </body>
 </html>
