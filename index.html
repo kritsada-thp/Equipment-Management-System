@@ -1222,30 +1222,58 @@ async function revertDisposal(assetNo) {
       } catch (err) { showSpinner(false); alert(err.message); }
     }
 
-    async function submitStatusUpdateForm() {
-      const arr = Array.from(statusSelectedAssetNos);
-      if (arr.length === 0) return alert('กรุณาเลือกรายการที่ต้องการอัปเดต');
-      const newStatus = document.getElementById('status_newStatus').value;
-      const fileInput = document.getElementById('status_attachmentFile');
-      showSpinner(true, `กำลังดำเนินการ ${arr.length} รายการ...`);
+    // ==========================================
+// ฟังก์ชันอัปเดตสถานะแบบ Bulk (รองรับจำนวนเยอะๆ พร้อม Progress Bar)
+// ==========================================
+async function submitStatusUpdateForm() {
+  const arr = Array.from(statusSelectedAssetNos);
+  if (arr.length === 0) return alert('กรุณาเลือกรายการที่ต้องการอัปเดต');
+  const newStatus = document.getElementById('status_newStatus').value;
+  const fileInput = document.getElementById('status_attachmentFile');
 
-      const proceedSubmit = async (imageBase64 = null) => {
-        try {
-          const res = await callGAS("updateAssetOperationalStatus", {
-            assetNoList: arr, status: newStatus, holder: "-", remarks: "-", 
-            imageBase64: imageBase64, fileName: 'location_img', userEmail: currentUser ? currentUser.email : "Staff"
-          });
-          showSpinner(false); playAudio('success'); alert(`สำเร็จ ${res.count} รายการ`);
-          statusSelectedAssetNos.clear(); if(fileInput) fileInput.value = ''; loadAssetData();
-        } catch (err) { showSpinner(false); alert(err.message); }
-      };
+  const proceedSubmit = async (imageBase64 = null) => {
+    // โชว์ Progress Bar อิงตามจำนวนทั้งหมดที่เลือก
+    showSpinner(true, `กำลังดำเนินการ ${arr.length} รายการ...`, { current: 0, total: arr.length });
+    
+    const chunkSize = 50; // หั่นข้อมูลทีละ 50 รายการ ส่งไป Apps Script ไม่ให้เกินขีดจำกัด
+    let successCount = 0;
 
-      if (fileInput && fileInput.files.length > 0) {
-        const reader = new FileReader();
-        reader.onload = function(evt) { proceedSubmit(evt.target.result); };
-        reader.readAsDataURL(fileInput.files[0]);
-      } else { proceedSubmit(null); }
+    try {
+      for (let i = 0; i < arr.length; i += chunkSize) {
+        const chunk = arr.slice(i, i + chunkSize);
+        
+        const res = await callGAS("updateAssetOperationalStatus", {
+          assetNoList: chunk, status: newStatus, holder: "-", remarks: "-", 
+          imageBase64: imageBase64, fileName: 'location_img', userEmail: currentUser ? currentUser.email : "Staff"
+        });
+
+        successCount += (res.count || chunk.length);
+        
+        // อัปเดต Progress Bar ทุกรอบที่ส่งสำเร็จ
+        showSpinner(true, `กำลังดำเนินการ ${arr.length} รายการ...`, { current: successCount, total: arr.length });
+      }
+
+      showSpinner(false); 
+      playAudio('success'); 
+      alert(`อัปเดตสถานะสำเร็จ ${successCount} รายการ`);
+      
+      statusSelectedAssetNos.clear(); 
+      if(fileInput) fileInput.value = ''; 
+      loadAssetData(); // โหลดตารางใหม่
+      
+    } catch (err) { 
+      showSpinner(false); alert('เกิดข้อผิดพลาด: ' + err.message); 
     }
+  };
+
+  if (fileInput && fileInput.files.length > 0) {
+    const reader = new FileReader();
+    reader.onload = function(evt) { proceedSubmit(evt.target.result); };
+    reader.readAsDataURL(fileInput.files[0]);
+  } else { 
+    proceedSubmit(null); 
+  }
+}
 
     async function markAsPendingDisposal(assetNoList) {
        if(!confirm('ยืนยันตั้งเป็น "รอตัดจำหน่าย" จำนวน ' + assetNoList.length + ' รายการ?')) return;
@@ -2134,7 +2162,9 @@ function openP10DetailModal(docNo) {
 }
 
 function closeP10DetailModal() { document.getElementById('p10DetailModal').classList.add('hidden'); }
-// อัปเดตตรรกะการรับคืน พ.10 ให้แสดง "รับคืนไม่ครบ" ทันที
+// ==========================================
+// ฟังก์ชันประมวลผลการรับคืน (แก้ไขบั๊กโหลดไม่ขึ้น & สถานะไม่เปลี่ยน)
+// ==========================================
 async function processReturnP10Items() {
     if (!activeP10Doc) return;
     const doc = activeP10Doc;
@@ -2159,32 +2189,50 @@ async function processReturnP10Items() {
 
     if (selectedToReturn.length > 0 && !confirm(`ยืนยันการรับคืนครุภัณฑ์จำนวน ${selectedToReturn.length} รายการ เข้าระบบคลัง?`)) return;
 
-    showSpinner(true, 'กำลังบันทึกข้อมูลการรับคืน...');
+    showSpinner(true, 'กำลังบันทึกข้อมูลการรับคืน...', { current: 0, total: selectedToReturn.length });
 
     try {
+        // 1. เปลี่ยนสถานะ Asset ที่ถูกติ๊กให้กลับเป็น 'ใช้งานปกติ' (แบ่งหั่นทีละ 50 ป้องกัน Timeout)
         if (selectedToReturn.length > 0) {
-            await callGAS("updateAssetOperationalStatus", {
-                assetNoList: selectedToReturn, status: "ใช้งานปกติ", holder: "-", remarks: `รับคืนจากใบ พ.10: ${doc.docNo || doc.p10running}`, 
-                imageBase64: null, fileName: '', userEmail: currentUser ? currentUser.email : "Staff"
-            });
+            const chunkSize = 50;
+            let successCount = 0;
+            for (let i = 0; i < selectedToReturn.length; i += chunkSize) {
+                const chunk = selectedToReturn.slice(i, i + chunkSize);
+                await callGAS("updateAssetOperationalStatus", {
+                    assetNoList: chunk, status: "ใช้งานปกติ", holder: "-", remarks: `รับคืนจากใบ พ.10: ${doc.docNo || doc.p10running}`, 
+                    imageBase64: null, fileName: '', userEmail: currentUser ? currentUser.email : "Staff"
+                });
+                successCount += chunk.length;
+                showSpinner(true, 'กำลังบันทึกข้อมูลการรับคืน...', { current: successCount, total: selectedToReturn.length });
+            }
         }
 
+        showSpinner(true, 'กำลังอัปเดตสถานะใบงาน พ.10...');
+
+        // 2. ประเมินสถานะของใบ พ.10 ภาพรวม
         let newReturnedCount = alreadyReturnedCount + selectedToReturn.length;
         let newDocStatus = doc.docStatus;
 
         if (newReturnedCount === totalItems && totalItems > 0) newDocStatus = "ส่งคืนสำเร็จ"; 
         else if (newReturnedCount > 0 && newReturnedCount < totalItems) newDocStatus = "ส่งคืนแล้วแต่ไม่ครบ"; 
 
+        // 3. บันทึกกลับลงเอกสาร พ.10
         await callGAS("updateP10DocStatus", { 
             docNo: doc.docNo || doc.p10running, docStatus: newDocStatus, statusRemarks: remarks 
         });
 
-        showSpinner(false); playAudio('success'); alert('อัปเดตการรับคืนสำเร็จ!');
+        // 4. รอจนดึงข้อมูลใหม่มาครบ 100% ค่อยเปิด Modal
         await loadAssetData(); 
+        await loadP10DocumentsList(); // <- จุดสำคัญ: ต้องมี await ตรงนี้เพื่อดึง Cache ใหม่
         
-        // รีโหลดสถานะ Modal ใหม่ทันที
+        showSpinner(false); 
+        playAudio('success'); 
+        alert('อัปเดตการรับคืนสำเร็จ!');
+        
+        // รีเฟรช Modal ด้วยข้อมูลล่าสุด
         const updatedDoc = p10DocsCache.find(x => x.docNo === (doc.docNo || doc.p10running));
         if (updatedDoc) openP10DetailModal(updatedDoc.docNo || updatedDoc.p10running); 
+
     } catch (err) {
         showSpinner(false); alert('เกิดข้อผิดพลาด: ' + err.message);
     }
