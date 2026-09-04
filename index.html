@@ -1623,6 +1623,212 @@
       statusCurrentPageNum = 1;
       renderStatusPaginatedTable();
     }
+    // ==========================================
+// ส่วนที่ขาดหายไป: จัดการระบบพิมพ์ QR Code และ Export Excel
+// ==========================================
+
+let qrPrintList = [];
+let qrCurrentPage = 1;
+const qrPageSize = 14;
+
+function changeQrPage(delta) {
+  qrCurrentPage += delta;
+  renderQrModalPage();
+}
+
+function truncateText(text, maxLength) {
+    if (!text) return '-';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+}
+
+function renderQrModalPage() {
+  const grid = document.getElementById('qrStatusTagGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  
+  const total = qrPrintList.length;
+  const totalPages = Math.ceil(total / qrPageSize);
+  if (qrCurrentPage > totalPages) qrCurrentPage = totalPages;
+  if (qrCurrentPage < 1) qrCurrentPage = 1;
+
+  const start = (qrCurrentPage - 1) * qrPageSize;
+  const end = Math.min(start + qrPageSize, total);
+  const pageItems = qrPrintList.slice(start, end);
+
+  document.getElementById('qrPaginationInfo').innerText = `แสดง ${start + 1} - ${end} จาก ${total} รายการ`;
+  document.getElementById('qrPageDisplay').innerText = `${qrCurrentPage} / ${totalPages || 1}`;
+  document.getElementById('btnQrPrev').disabled = (qrCurrentPage <= 1);
+  document.getElementById('btnQrNext').disabled = (qrCurrentPage >= totalPages || totalPages === 0);
+  
+  pageItems.forEach(assetNo => {
+    const item = assetDataCache.find(x => x.assetNo === assetNo) || { assetNo: assetNo };
+    const tagId = 'qr_tag_' + assetNo.replace(/[^a-zA-Z0-9]/g, '');
+    
+    let rcvDate = '-';
+    if (item.receivedDate) {
+      const d = new Date(item.receivedDate);
+      rcvDate = isNaN(d.getTime()) ? item.receivedDate : d.toLocaleDateString('th-TH');
+    }
+
+    const displaySubClass = truncateText(item.subClass, 45);
+    const displayDesc = truncateText(item.description1, 60);
+
+    grid.innerHTML += `
+      <div class="border-2 border-slate-300 p-3 rounded-xl flex items-center gap-4 bg-white text-black shadow-sm min-h-[120px] h-full">
+        <div id="${tagId}" class="p-1 bg-white border border-slate-200 rounded-lg shrink-0 w-[90px] h-[90px] flex items-center justify-center overflow-hidden"></div>
+        <div class="overflow-hidden flex-1 flex flex-col justify-center space-y-1">
+          <p class="font-bold text-[15px] leading-snug text-black">${item.assetNo}</p>
+          <p class="text-[11px] leading-snug text-slate-700">${displaySubClass}</p>
+          <p class="text-[11px] leading-snug text-slate-700"><span class="font-semibold text-slate-900">รับ:</span> ${rcvDate}</p>
+          <p class="text-[11px] leading-snug text-slate-700" title="${item.description1 || ''}">${displayDesc}</p>
+        </div>
+      </div>
+    `;
+    
+    setTimeout(() => {
+      const qrContainer = document.getElementById(tagId);
+      if (qrContainer) {
+        qrContainer.innerHTML = '';
+        new QRCode(qrContainer, { text: item.assetNo, width: 80, height: 80, correctLevel: QRCode.CorrectLevel.M });
+        const canvas = qrContainer.querySelector('canvas');
+        if(canvas) canvas.style.cssText = 'max-width: 100% !important; height: auto !important; margin: auto; display: block;';
+      }
+    }, 50);
+  });
+}
+
+async function downloadAllQrPdf() {
+  const totalItems = qrPrintList.length;
+  if (totalItems === 0) return alert('ไม่มีรายการให้ดาวน์โหลด');
+  
+  const spinnerOverlay = document.getElementById('loadingOverlay');
+  if (spinnerOverlay) spinnerOverlay.style.zIndex = '9999';
+  
+  showSpinner(true, 'กำลังเตรียมโครงสร้างเอกสาร PDF...', { current: 0, total: totalItems });
+  
+  const printArea = document.getElementById('printableArea');
+  printArea.classList.remove('hidden');
+  printArea.style.position = 'fixed';
+  printArea.style.top = '0';
+  printArea.style.left = '0';
+  printArea.style.zIndex = '40';
+  printArea.style.background = 'white';
+  printArea.style.height = '100vh';
+  printArea.style.width = '100vw';
+  printArea.style.overflow = 'hidden';
+  
+  let htmlString = `<div id="pdfExportArea" style="width: 210mm; background: white; color: black; font-family: 'Sarabun', sans-serif;">`;
+  
+  for (let i = 0; i < totalItems; i += qrPageSize) {
+    const isLastPage = (i + qrPageSize) >= totalItems;
+    const pageBreakStyle = isLastPage ? '' : 'page-break-after: always;';
+    
+    htmlString += `
+      <div style="width: 210mm; padding: 10mm; box-sizing: border-box; background: white; ${pageBreakStyle}">
+        <h2 style="text-align: center; margin-bottom: 20px; font-weight: bold; font-size: 16px;">ป้าย QR Code ครุภัณฑ์ (หน้า ${Math.floor(i / qrPageSize) + 1})</h2>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+    `;
+    
+    const chunk = qrPrintList.slice(i, i + qrPageSize);
+    chunk.forEach(assetNo => {
+       const item = assetDataCache.find(x => x.assetNo === assetNo) || { assetNo: assetNo };
+       let rcvDate = item.receivedDate ? (!isNaN(new Date(item.receivedDate).getTime()) ? new Date(item.receivedDate).toLocaleDateString('th-TH') : item.receivedDate) : '-';
+       const tagId = 'pdf_qr_' + assetNo.replace(/[^a-zA-Z0-9]/g, '');
+       const displaySubClass = truncateText(item.subClass, 45);
+       const displayDesc = truncateText(item.description1, 60);
+       
+       htmlString += `
+         <div style="border: 2px solid #cbd5e1; padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 15px; height: 130px; background: white; page-break-inside: avoid; overflow: hidden;">
+           <div id="${tagId}" style="width: 90px; height: 90px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;"></div>
+           <div style="flex: 1; overflow: hidden; display: flex; flex-direction: column; justify-content: center;">
+             <p style="font-weight: bold; font-size: 16px; margin: 0 0 5px 0; line-height: 1;">${item.assetNo}</p>
+             <p style="font-size: 12px; margin: 0 0 4px 0; line-height: 1.3; color: #334155;">${displaySubClass}</p>
+             <p style="font-size: 12px; margin: 0 0 4px 0; line-height: 1.3; color: #334155;"><strong>รับ:</strong> ${rcvDate}</p>
+             <p style="font-size: 12px; margin: 0; line-height: 1.4; color: #334155;">${displayDesc}</p>
+           </div>
+         </div>
+       `;
+    });
+    htmlString += `</div></div>`;
+  }
+  htmlString += `</div>`;
+  printArea.innerHTML = htmlString;
+
+  for(let i = 0; i < totalItems; i++) {
+     const assetNo = qrPrintList[i];
+     const tagId = 'pdf_qr_' + assetNo.replace(/[^a-zA-Z0-9]/g, '');
+     const container = document.getElementById(tagId);
+     
+     if(container) {
+        new QRCode(container, { text: assetNo, width: 80, height: 80, correctLevel: QRCode.CorrectLevel.M });
+        const cvs = container.querySelector('canvas');
+        const img = container.querySelector('img');
+        if (cvs && img) {
+           img.src = cvs.toDataURL('image/png');
+           img.style.display = 'block';
+           img.style.margin = 'auto';
+           cvs.style.display = 'none';
+        }
+        if (i % 3 === 0 || i === totalItems - 1) {
+          showSpinner(true, 'กำลังสร้างรูป QR Code...', { current: i + 1, total: totalItems });
+          await new Promise(r => setTimeout(r, 15)); 
+        }
+     }
+  }
+
+  showSpinner(true, 'กำลังแปลงไฟล์เป็น PDF...', { current: totalItems, total: totalItems });
+  await new Promise(r => setTimeout(r, 1000)); 
+
+  const element = document.getElementById('pdfExportArea');
+  const opt = {
+    margin:       0,
+    filename:     `EMS_QRCode_${new Date().toISOString().slice(0,10)}.pdf`,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  
+  try {
+    await html2pdf().set(opt).from(element).save();
+  } catch (err) {
+    alert('เกิดข้อผิดพลาดในการสร้าง PDF: ' + err.message);
+  } finally {
+    printArea.innerHTML = '';
+    printArea.classList.add('hidden');
+    printArea.removeAttribute('style');
+    if (spinnerOverlay) spinnerOverlay.style.zIndex = '150'; 
+    showSpinner(false);
+    playAudio('success');
+  }
+}
+
+function exportFilteredAssetsExcel() {
+  if (filteredAssets.length === 0) return alert('ไม่มีข้อมูลสำหรับ Export');
+  showSpinner(true, 'กำลังส่งออกไฟล์ Excel...');
+  setTimeout(() => {
+    const exportData = filteredAssets.map(item => ({
+      "เลขที่สินทรัพย์ (Asset No.)": item.assetNo || '',
+      "ประเภทสินทรัพย์ (Asset Class)": item.assetClass || '',
+      "คำอธิบายสินทรัพย์ 1": item.description1 || '',
+      "คำอธิบายสินทรัพย์ 2": item.description2 || '',
+      "ศูนย์ต้นทุน": item.costCenter || '',
+      "สถานะปฏิบัติงาน": item.current_status || '',
+      "ผู้ถือครองปัจจุบัน": item.current_holder || '',
+      "มูลค่าสินทรัพย์": item.assetValue || '',
+      "มูลค่าคงเหลือตามบัญชี": item.bookValue || '',
+      "ชื่อผู้ขาย (Vendor)": item.vendor || '',
+      "หมายเหตุ": item.remarks || ''
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Assets_Export");
+    XLSX.writeFile(wb, `EMS_Asset_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
+    showSpinner(false);
+    playAudio('success');
+  }, 300);
+}
   </script>
 </body>
 </html>
