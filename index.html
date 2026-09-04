@@ -1389,26 +1389,22 @@
     document.getElementById('liveScanOverlay').classList.remove('hidden');
     document.getElementById('liveScanOverlay').classList.add('flex');
     document.getElementById('fallbackCameraBtn').classList.add('hidden');
-    document.getElementById('qrScanStatusOverlay').innerText = "กำลังโฟกัส QR Code...";
+    document.getElementById('qrScanStatusOverlay').innerText = "กำลังค้นหา QR Code...";
     
     setTimeout(() => {
-        // คำนวณขนาดกรอบ QR ให้ยืดหยุ่นเป็น 75% ของหน้าจอมือถือ (ป้องกันปัญหากรอบใหญ่/เล็กเกินไป)
+        // คำนวณขนาดกรอบ QR ให้ยืดหยุ่น ป้องกันกรอบล้นจอ
         const screenMin = Math.min(window.innerWidth, window.innerHeight);
-        const qrboxSize = Math.floor(screenMin * 0.75);
+        const qrboxSize = Math.floor(screenMin * 0.7);
 
         html5QrCodeLive = new Html5Qrcode("liveScanReader");
+        
         html5QrCodeLive.start(
+            { facingMode: "environment" }, // บังคับใช้กล้องหลัง
             { 
-                facingMode: "environment",
-                // บังคับให้ฮาร์ดแวร์กล้องมือถือทำ Auto Focus แบบต่อเนื่อง
-                advanced: [{ focusMode: "continuous" }] 
-            }, 
-            { 
-                fps: 30, // ดันเฟรมเรตเป็น 30 FPS เพื่อให้ภาพลื่นไหลและจับภาพได้ไวขึ้น
+                fps: 10, // ใช้ 10 FPS เป็นค่ามาตรฐานที่เสถียรที่สุด ไม่ทำให้กล้องค้าง
                 qrbox: { width: qrboxSize, height: qrboxSize },
-                // ลบข้อจำกัด aspectRatio ออก ป้องกันปัญหาภาพกล้องยืดเบี้ยวในมือถือจอยาว
-                useBarCodeDetectorIfSupported: true,
-                formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ]
+                disableFlip: false // ป้องกันปัญหากล้องกลับซ้ายขวา
+                // ลบ useBarCodeDetectorIfSupported ออก เพื่อใช้ Engine มาตรฐานที่เสถียรกว่า
             },
             (decodedText) => {
                 if(isScanning) return; 
@@ -1416,16 +1412,19 @@
                 playAudio('success');
                 addToCart(decodedText);
                 document.getElementById('qrScanStatusOverlay').innerText = "เพิ่มลงตะกร้าสำเร็จ!";
+                
+                // หน่วงเวลาเล็กน้อยก่อนปิดหน้ากล้อง ให้ผู้ใช้เห็นว่าสแกนติดแล้ว
                 setTimeout(() => {
                     closeLiveScanner();
                     isScanning = false;
                 }, 600);
             },
             (errorMessage) => {
-                // ไม่ต้องแสดง Error ในระหว่างที่กล้องยังหา QR ไม่เจอ
+                // ตัวสแกนจะทำงานเงียบๆ จนกว่าจะเจอ QR
             }
         ).catch(err => {
-            console.error("Camera Error:", err);
+            console.error("Camera Error: ", err);
+            document.getElementById('qrScanStatusOverlay').innerText = "ไม่สามารถเข้าถึงกล้องได้";
             document.getElementById('fallbackCameraBtn').classList.remove('hidden');
         });
     }, 300);
