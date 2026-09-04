@@ -1386,42 +1386,50 @@
     // 4. LIVE QR SCANNER (Fast Scan Optimized)
     // ==========================================
     function openLiveScanner() {
-        document.getElementById('liveScanOverlay').classList.remove('hidden');
-        document.getElementById('liveScanOverlay').classList.add('flex');
-        document.getElementById('fallbackCameraBtn').classList.add('hidden');
-        document.getElementById('qrScanStatusOverlay').innerText = "กำลังโฟกัส QR Code...";
-        
-        setTimeout(() => {
-            html5QrCodeLive = new Html5Qrcode("liveScanReader");
-            html5QrCodeLive.start(
-                { facingMode: "environment" }, // บังคับกล้องหลัง
-                { 
-                    fps: 15, // ความเร็วในการสแกน 15 เฟรมต่อวินาที ไหลลื่น
-                    qrbox: { width: 250, height: 250 },
-                    aspectRatio: 1.0,
-                    useBarCodeDetectorIfSupported: true, // เร่งฮาร์ดแวร์เพื่อให้จ่อแล้วติดเลย
-                    formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ] 
-                },
-                (decodedText) => {
-                    if(isScanning) return; 
-                    isScanning = true;
-                    playAudio('success');
-                    addToCart(decodedText);
-                    document.getElementById('qrScanStatusOverlay').innerText = "เพิ่มลงตะกร้าสำเร็จ!";
-                    setTimeout(() => {
-                        closeLiveScanner();
-                        isScanning = false;
-                    }, 600);
-                },
-                (errorMessage) => {
-                    // Ignore: error จะวิ่งตลอดเมื่อยังไม่เจอ QR 
-                }
-            ).catch(err => {
-                // เบราว์เซอร์อาจบล็อกกล้อง ให้ปุ่มถ่ายรูปแทนโผล่ขึ้นมา
-                document.getElementById('fallbackCameraBtn').classList.remove('hidden');
-            });
-        }, 300);
-    }
+    document.getElementById('liveScanOverlay').classList.remove('hidden');
+    document.getElementById('liveScanOverlay').classList.add('flex');
+    document.getElementById('fallbackCameraBtn').classList.add('hidden');
+    document.getElementById('qrScanStatusOverlay').innerText = "กำลังโฟกัส QR Code...";
+    
+    setTimeout(() => {
+        // คำนวณขนาดกรอบ QR ให้ยืดหยุ่นเป็น 75% ของหน้าจอมือถือ (ป้องกันปัญหากรอบใหญ่/เล็กเกินไป)
+        const screenMin = Math.min(window.innerWidth, window.innerHeight);
+        const qrboxSize = Math.floor(screenMin * 0.75);
+
+        html5QrCodeLive = new Html5Qrcode("liveScanReader");
+        html5QrCodeLive.start(
+            { 
+                facingMode: "environment",
+                // บังคับให้ฮาร์ดแวร์กล้องมือถือทำ Auto Focus แบบต่อเนื่อง
+                advanced: [{ focusMode: "continuous" }] 
+            }, 
+            { 
+                fps: 30, // ดันเฟรมเรตเป็น 30 FPS เพื่อให้ภาพลื่นไหลและจับภาพได้ไวขึ้น
+                qrbox: { width: qrboxSize, height: qrboxSize },
+                // ลบข้อจำกัด aspectRatio ออก ป้องกันปัญหาภาพกล้องยืดเบี้ยวในมือถือจอยาว
+                useBarCodeDetectorIfSupported: true,
+                formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ]
+            },
+            (decodedText) => {
+                if(isScanning) return; 
+                isScanning = true;
+                playAudio('success');
+                addToCart(decodedText);
+                document.getElementById('qrScanStatusOverlay').innerText = "เพิ่มลงตะกร้าสำเร็จ!";
+                setTimeout(() => {
+                    closeLiveScanner();
+                    isScanning = false;
+                }, 600);
+            },
+            (errorMessage) => {
+                // ไม่ต้องแสดง Error ในระหว่างที่กล้องยังหา QR ไม่เจอ
+            }
+        ).catch(err => {
+            console.error("Camera Error:", err);
+            document.getElementById('fallbackCameraBtn').classList.remove('hidden');
+        });
+    }, 300);
+}
 
     function closeLiveScanner() {
         document.getElementById('liveScanOverlay').classList.remove('flex');
