@@ -2,13 +2,11 @@
 <html lang="th" class="h-full bg-slate-900">
 <head>
   <meta charset="UTF-8">
-  <!-- PWA & Mobile Viewport Tags: ล็อกหน้าจอ ไม่ให้ซูม และเคลียร์ขอบ iOS -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>ระบบบริหารจัดการครุภัณฑ์ - ไปรษณีย์ไทย (EMS Pro)</title>
 
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -27,18 +25,15 @@
     }
   </script>
 
-  <!-- Google Fonts & Remixicon -->
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
   
-  <!-- Libraries for Chart, QR, Excel, PDF -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 
@@ -48,11 +43,13 @@
     body, html { height: 100dvh; width: 100vw; overflow: hidden; margin: 0; padding: 0; }
     
     .glass-card {
-      background: rgba(30, 41, 59, 0.65); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      background: rgba(30, 41, 59, 0.65);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .glass-input {
-      background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.15); color: #f8fafc;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.15); color: #f8fafc;
     }
     .glass-input:focus { border-color: #ef4444; outline: none; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25); }
     .sidebar-transition { transition: transform 0.3s ease-in-out, width 0.3s ease-in-out; }
@@ -74,11 +71,9 @@
 </head>
 <body class="bg-slate-950 text-slate-100 antialiased selection:bg-red-600 selection:text-white">
 
-  <!-- Audio Effects -->
   <audio id="soundSuccess" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
   <audio id="soundError" src="https://assets.mixkit.co/active_storage/sfx/2573/2573-preview.mp3" preload="auto"></audio>
 
-  <!-- INITIAL APP LOADER -->
   <div id="initialAppLoader" class="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-slate-950 transition-opacity duration-300">
     <div class="p-3 bg-red-600 text-white rounded-2xl shadow-xl shadow-red-600/30 animate-bounce mb-3">
       <i class="ri-box-3-fill text-3xl"></i>
@@ -87,7 +82,6 @@
     <p class="text-xs text-slate-400 mt-1 animate-pulse">กำลังตรวจสอบสิทธิ์ผู้ใช้งาน...</p>
   </div>
 
-  <!-- REAL-TIME PROGRESS BAR OVERLAY -->
   <div id="loadingOverlay" class="fixed inset-0 z-[150] flex flex-col items-center justify-center bg-slate-950/85 backdrop-blur-md hidden p-4">
     <div class="glass-card p-6 rounded-2xl max-w-md w-full text-center space-y-4 shadow-2xl border border-slate-800">
       <div class="relative flex items-center justify-center mx-auto">
@@ -110,13 +104,12 @@
     </div>
   </div>
 
-  <!-- AUTH GATE VIEW (LOGIN) -->
   <div id="authView" class="h-[100dvh] w-full flex items-center justify-center p-4 bg-gradient-to-br from-slate-950 via-slate-900 to-red-950 hidden absolute top-0 left-0 z-[100]">
     <div class="w-full max-w-md p-8 glass-card rounded-2xl shadow-2xl relative overflow-hidden border border-slate-800">
       <div class="absolute -top-10 -right-10 w-32 h-32 bg-red-600/20 rounded-full blur-3xl"></div>
       <div class="text-center mb-8">
         <div class="inline-flex p-3 rounded-2xl bg-red-600/10 text-red-500 border border-red-500/20 mb-3">
-          <i class="ri-box-3-fill text-4xl"></i>
+           <i class="ri-box-3-fill text-4xl"></i>
         </div>
         <h2 class="text-2xl font-bold tracking-tight text-white">ระบบบริหารจัดการครุภัณฑ์</h2>
         <p class="text-xs text-slate-400 mt-1">ฝ่ายบริการธุรกิจไปรษณีย์และโลจิสติกส์ (EMS Pro)</p>
@@ -147,10 +140,8 @@
     </div>
   </div>
 
-  <!-- MAIN APPLICATION WRAPPER -->
   <div id="mainApp" class="h-[100dvh] w-[100vw] flex bg-slate-950 hidden relative overflow-hidden">
     
-    <!-- SIDEBAR NAVIGATION -->
     <aside id="sidebar" class="sidebar-transition fixed inset-y-0 left-0 z-[60] w-64 glass-card border-r border-slate-800/60 flex flex-col justify-between -translate-x-full md:translate-x-0 shadow-2xl md:shadow-none bg-slate-900/95">
       <div>
         <div class="h-16 px-5 flex items-center justify-between border-b border-slate-800/80 bg-slate-900/50">
@@ -159,7 +150,7 @@
           </button>
           <div class="flex items-center gap-3 sidebar-text">
             <div class="p-2 bg-red-600 text-white rounded-xl shadow-md shadow-red-600/30">
-              <i class="ri-box-3-fill text-lg"></i>
+               <i class="ri-box-3-fill text-lg"></i>
             </div>
             <div>
               <h1 class="font-bold text-sm tracking-wide text-white">EMS PRO</h1>
@@ -217,7 +208,6 @@
       </div>
     </aside>
 
-    <!-- MAIN CONTENT CONTAINER -->
     <main id="mainContainer" class="flex-1 w-full h-[100dvh] overflow-y-auto overflow-x-hidden md:ml-64 p-3 md:p-6 transition-all duration-300 relative">
       
       <header class="flex items-center justify-between mb-6 pb-4 border-b border-slate-800/80">
@@ -250,7 +240,6 @@
         </div>
       </header>
 
-      <!-- VIEW 1: DASHBOARD -->
       <div id="dashboardView" class="page-fade space-y-6 hidden">
         <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
           <div class="glass-card p-4 rounded-2xl col-span-2 md:col-span-1 border border-slate-800">
@@ -315,7 +304,6 @@
         </div>
       </div>
 
-      <!-- VIEW 2: ASSET LIST TABLE -->
       <div id="assetListView" class="page-fade space-y-4">
         <div class="glass-card p-4 md:p-5 rounded-2xl flex flex-wrap items-center justify-between gap-4">
           <div class="flex items-center gap-3 w-full md:w-auto justify-between">
@@ -355,7 +343,6 @@
 
         <div class="glass-card rounded-2xl overflow-hidden shadow-xl">
           <div class="overflow-x-auto hide-scrollbar">
-            <!-- เพิ่ม min-w-[800px] ป้องกันตารางบีบตัวจนอ่านไม่ออก -->
             <table class="w-full min-w-[800px] text-left text-xs text-slate-300" id="assetTable">
               <thead class="bg-slate-900/80 uppercase text-[10px] font-bold text-slate-400 border-b border-slate-800">
                 <tr>
@@ -395,7 +382,6 @@
         </div>
       </div>
 
-      <!-- VIEW 3: CARD MENU TABS - "จัดการสถานะครุภัณฑ์" -->
       <div id="assetStatusView" class="page-fade space-y-6 hidden">
         
         <div class="flex items-center gap-2 border-b border-slate-800 pb-3 overflow-x-auto hide-scrollbar snap-x">
@@ -410,7 +396,6 @@
           </button>
         </div>
 
-        <!-- CARD TAB 1: รายการ พ.10 -->
         <div id="statusTab1" class="glass-card p-5 rounded-2xl space-y-4 border border-slate-800">
           <div class="flex justify-between items-center flex-wrap gap-3">
             <h3 class="text-base font-bold text-white flex items-center gap-2">
@@ -440,7 +425,6 @@
           </div>
         </div>
 
-        <!-- CARD TAB 2: ทำรายการ ยืม-คืน-โอน (สร้าง พ.10) -->
         <div id="statusTab2" class="glass-card p-5 rounded-2xl space-y-5 border border-slate-800 hidden">
           <h3 class="text-base font-bold text-white flex items-center gap-2">
             <i class="ri-add-circle-line text-red-500"></i> สร้างเอกสาร พ.10
@@ -500,7 +484,6 @@
           </div>
         </div>
 
-        <!-- CARD TAB 3: สถานะรายการ & แนบรูปถ่ายสถานที่วาง -->
         <div id="statusTab3" class="glass-card p-5 rounded-2xl space-y-4 border border-slate-800 hidden">
           <div class="flex justify-between items-center flex-wrap gap-3">
             <div>
@@ -566,7 +549,6 @@
         </div>
       </div>
 
-      <!-- MODALS -->
       <div id="p10DetailModal" class="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/80 backdrop-blur-md hidden p-4">
         <div class="glass-card w-full max-w-3xl rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
           <div class="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
@@ -690,7 +672,6 @@
         </div>
       </div>
 
-      <!-- FULLSCREEN LIVE QR SCANNER (REST API Compatible) -->
       <div id="liveScanOverlay" class="fixed inset-0 z-[200] bg-black hidden flex-col transition-opacity duration-300">
          <div class="p-5 flex justify-between items-center bg-gradient-to-b from-black/90 to-transparent absolute top-0 w-full z-20">
              <h3 class="text-white font-bold text-lg drop-shadow-md"><i class="ri-qr-scan-2-line text-red-500"></i> ส่อง QR Code ครุภัณฑ์</h3>
@@ -715,7 +696,6 @@
                 นำกล้องจ่อที่ QR Code เพื่อเพิ่มลงใบ พ.10 อัตโนมัติ
              </p>
          </div>
-         <!-- Hidden div for processing fallback images -->
          <div id="dummyQrReader" class="hidden"></div>
       </div>
 
@@ -726,17 +706,19 @@
     // ==========================================
     // 1. API & FIREBASE SETUP (GitHub Pages Ready)
     // ==========================================
-    // 1. API & FIREBASE SETUP
+    
+    // URL ของ Web App จาก Google Apps Script (สำคัญมาก: ห้ามมีช่องว่าง)
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyuEpb2SWcZ9QGF6FErjzPI08YzC6s6nd_pRzGFz8d1px7dHqYACJL5qgwH10sDQUIq3A/exec";
 
+    // ฟังก์ชันสำคัญสำหรับเลี่ยง CORS Preflight บน GitHub Pages
     async function callGAS(action, payload = {}) {
         const response = await fetch(GAS_API_URL, {
             method: "POST",
+            redirect: "follow", // จำเป็นสำหรับ GAS
             headers: {
-                "Content-Type": "text/plain;charset=utf-8",
+                "Content-Type": "text/plain;charset=utf-8", // บังคับส่งเป็น text เพื่อเลี่ยง OPTIONS Preflight
             },
-            body: JSON.stringify({ action: action, payload: payload }),
-            redirect: "follow"
+            body: JSON.stringify({ action: action, payload: payload })
         });
         const result = await response.json();
         if (!result.success) throw new Error(result.error);
@@ -898,7 +880,6 @@
         assetListView: { title: '<i class="ri-file-list-3-line text-red-500"></i> รายการทั้งหมด', sub: 'จัดการข้อมูลและตรวจดูครุภัณฑ์' },
         assetStatusView: { title: '<i class="ri-list-settings-line text-red-500"></i> จัดการสถานะ', sub: 'พ.10 และ ปรับสถานะ' },
       };
-
       if (titles[targetPage]) {
         document.getElementById('pageTitle').innerHTML = titles[targetPage].title;
         document.getElementById('pageSubTitle').innerText = titles[targetPage].sub;
@@ -915,7 +896,6 @@
           loadP10DocumentsList();
         }
       }, 250);
-
       if (window.innerWidth < 768) {
         document.getElementById('sidebar').classList.add('-translate-x-full');
       }
@@ -1047,7 +1027,6 @@
       const startIndex = (currentPageNum - 1) * pageSize;
       const endIndex = Math.min(startIndex + pageSize, total);
       const pageData = filteredAssets.slice(startIndex, endIndex);
-
       pageData.forEach((item, pageIndex) => {
         const globalIndex = startIndex + pageIndex;
         const originalIndex = assetDataCache.findIndex(x => x.assetNo === item.assetNo);
@@ -1061,7 +1040,7 @@
         if (lifeInfo.status === 'expired') lifeBadge = `<span class="text-red-500 font-bold">${lifeInfo.text}</span>`;
         else if (lifeInfo.status === 'warning') lifeBadge = `<span class="text-amber-500 font-bold">${lifeInfo.text}</span>`;
         else lifeBadge = `<span class="text-slate-400">${lifeInfo.text}</span>`;
-
+        
         tbody.innerHTML += `
           <tr class="hover:bg-slate-900/50 transition-colors ${isChecked ? 'bg-red-950/20' : ''}">
             <td class="p-3.5 text-center"><input type="checkbox" value="${item.assetNo}" data-index="${globalIndex}" ${isChecked ? 'checked' : ''} onclick="handleCheckboxClick(event, this)" class="rounded bg-slate-900 border-slate-700 text-red-600"></td>
@@ -1225,7 +1204,7 @@
       const newStatus = document.getElementById('status_newStatus').value;
       const fileInput = document.getElementById('status_attachmentFile');
       showSpinner(true, `กำลังดำเนินการ ${arr.length} รายการ...`);
-
+      
       const proceedSubmit = async (imageBase64 = null) => {
         try {
           const res = await callGAS("updateAssetOperationalStatus", {
@@ -1265,7 +1244,8 @@
       try {
         const logs = await callGAS("getAssetStatusHistory", assetNo);
         if (logs.length === 0) {
-          content.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">ไม่พบประวัติ</p>'; return;
+          content.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">ไม่พบประวัติ</p>';
+          return;
         }
         content.innerHTML = logs.map(log => `
           <div class="glass-card p-3 rounded-xl space-y-1 text-xs border border-slate-800">
@@ -1287,7 +1267,8 @@
       showSpinner(true, 'กำลังบันทึก...');
       try {
         await callGAS("updateP10DocStatus", { docNo: activeP10Doc.docNo, docStatus: status, statusRemarks: remarks });
-        showSpinner(false); playAudio('success'); alert('อัปเดตเรียบร้อย');
+        showSpinner(false);
+        playAudio('success'); alert('อัปเดตเรียบร้อย');
         activeP10Doc.docStatus = status; openP10DetailModal(activeP10Doc.docNo); loadP10DocumentsList();
       } catch (err) { showSpinner(false); alert(err.message); }
     }
@@ -1354,7 +1335,6 @@
         if (rawJsonData.length === 0) return alert('ไม่มีข้อมูล');
         const normalizedItems = rawJsonData.map(normalizeExcelRow).filter(item => item !== null);
         if (normalizedItems.length === 0) return alert('ไม่พบข้อมูลสินทรัพย์ที่มี "เลขที่สินทรัพย์" (Asset No.) ในคอลัมน์ C');
-        
         const totalItems = normalizedItems.length;
         const chunkSize = 50;
         let successCount = 0; let failedCount = 0;
@@ -1396,26 +1376,24 @@
     }
 
     // ==========================================
-    // 4. LIVE QR SCANNER (REST API Compatible)
+    // 4. LIVE QR SCANNER (Fast Scan Optimized)
     // ==========================================
     function openLiveScanner() {
         document.getElementById('liveScanOverlay').classList.remove('hidden');
         document.getElementById('liveScanOverlay').classList.add('flex');
         document.getElementById('fallbackCameraBtn').classList.add('hidden');
-        document.getElementById('qrScanStatusOverlay').innerText = "นำกล้องจ่อที่ QR Code...";
+        document.getElementById('qrScanStatusOverlay').innerText = "กำลังโฟกัส QR Code...";
         
         setTimeout(() => {
             html5QrCodeLive = new Html5Qrcode("liveScanReader");
             html5QrCodeLive.start(
-                { facingMode: "environment" }, 
+                { facingMode: "environment" }, // บังคับกล้องหลัง
                 { 
-                    fps: 20, // เพิ่มความถี่การอ่านภาพให้ไวขึ้น (จาก 10 เป็น 20)
-                    qrbox: function(viewfinderWidth, viewFinderHeight) {
-                        // ปรับขนาดกรอบสแกนให้พอดีกับหน้าจอมือถืออัตโนมัติ
-                        let minEdgeSize = Math.min(viewfinderWidth, viewFinderHeight);
-                        let qrboxSize = Math.floor(minEdgeSize * 0.75); 
-                        return { width: qrboxSize, height: qrboxSize };
-                    }
+                    fps: 15, // ความเร็วในการสแกน 15 เฟรมต่อวินาที ไหลลื่น
+                    qrbox: { width: 250, height: 250 },
+                    aspectRatio: 1.0,
+                    useBarCodeDetectorIfSupported: true, // เร่งฮาร์ดแวร์เพื่อให้จ่อแล้วติดเลย
+                    formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ] 
                 },
                 (decodedText) => {
                     if(isScanning) return; 
@@ -1426,13 +1404,13 @@
                     setTimeout(() => {
                         closeLiveScanner();
                         isScanning = false;
-                    }, 500); // ดีเลย์สั้นลงให้ปิดกล้องไวขึ้น
+                    }, 600);
                 },
                 (errorMessage) => {
-                    // ปล่อยว่างไว้ ไลบรารีจะทำงานอัตโนมัติไปเรื่อยๆ จนกว่าจะเจอ
+                    // Ignore: error จะวิ่งตลอดเมื่อยังไม่เจอ QR 
                 }
             ).catch(err => {
-                // หากถูกบล็อก ให้ปุ่มถ่ายรูปสำรองเด้งขึ้นมา
+                // เบราว์เซอร์อาจบล็อกกล้อง ให้ปุ่มถ่ายรูปแทนโผล่ขึ้นมา
                 document.getElementById('fallbackCameraBtn').classList.remove('hidden');
             });
         }, 300);
@@ -1449,7 +1427,7 @@
         if (!file) return;
         document.getElementById('qrScanStatusOverlay').innerText = "กำลังประมวลผลรูปภาพ...";
         
-        const tempQr = new Html5Qrcode("dummyQrReader"); 
+        const tempQr = new Html5Qrcode("dummyQrReader");
         tempQr.scanFile(file, true).then(decodedText => {
             playAudio('success'); addToCart(decodedText); closeLiveScanner();
         }).catch(err => {
@@ -1478,13 +1456,17 @@
 
     // Expiry Check System
     function parseCustomDate(str) {
-      if(!str) return null; let d = new Date(str);
+      if(!str) return null;
+      let d = new Date(str);
       if(!isNaN(d.getTime())) return d;
-      let parts = str.split('/'); if(parts.length===3) { let y=parseInt(parts[2]); if(y>2400)y-=543; return new Date(y, parts[1]-1, parts[0]); } return null;
+      let parts = str.split('/'); if(parts.length===3) { let y=parseInt(parts[2]); if(y>2400)y-=543;
+      return new Date(y, parts[1]-1, parts[0]); } return null;
     }
     function calculateRemainingLife(receivedDate, lifeYears, lifeMonths) {
-      const start = parseCustomDate(receivedDate); if(!start) return { text: '-', status: 'none' };
-      const y = parseInt(lifeYears)||0, m = parseInt(lifeMonths)||0; if(!y && !m) return { text: '-', status: 'none' };
+      const start = parseCustomDate(receivedDate);
+      if(!start) return { text: '-', status: 'none' };
+      const y = parseInt(lifeYears)||0, m = parseInt(lifeMonths)||0;
+      if(!y && !m) return { text: '-', status: 'none' };
       const exp = new Date(start); exp.setFullYear(exp.getFullYear()+y); exp.setMonth(exp.getMonth()+m);
       const diffDays = Math.ceil((exp - new Date()) / (1000*60*60*24));
       if (diffDays < 0) return { text: 'หมดอายุแล้ว', status: 'expired' };
@@ -1502,7 +1484,8 @@
     function openExpiryNotifyModal() { filteredExpiryAssets = [...expiredAssetsList]; renderExpiryTable(); document.getElementById('expiryNotifyModal').classList.remove('hidden'); }
     function closeExpiryModal() { document.getElementById('expiryNotifyModal').classList.add('hidden'); }
     function renderExpiryTable() {
-       const tbody = document.getElementById('expiryListBody'); tbody.innerHTML = ''; document.getElementById('expiryTotalText').innerText = filteredExpiryAssets.length;
+       const tbody = document.getElementById('expiryListBody'); tbody.innerHTML = '';
+       document.getElementById('expiryTotalText').innerText = filteredExpiryAssets.length;
        filteredExpiryAssets.slice(0, 15).forEach((item) => {
           tbody.innerHTML += `<tr class="hover:bg-slate-900/50"><td class="p-3 text-center"><input type="checkbox" value="${item.assetNo}" class="rounded bg-slate-900 text-red-600"></td>
           <td class="p-3 font-bold text-white">${item.assetNo}</td><td class="p-3">${item.description1||'-'}</td><td class="p-3">${item.receivedDate||'-'}</td>
@@ -1528,7 +1511,8 @@
       let assetNo = '';
       for (let i = 0; i < keys.length; i++) {
         if (cleanKeys[i].includes('เลขที่สินทรัพย์') && !cleanKeys[i].includes('ขอสร้าง') && !cleanKeys[i].includes('ย่อย') && !cleanKeys[i].includes('เก่า')) {
-          assetNo = String(row[keys[i]]).trim(); break;
+          assetNo = String(row[keys[i]]).trim();
+          break;
         }
       }
       if (!assetNo && keys.length >= 3) assetNo = String(row[keys[2]]).trim();
@@ -1566,10 +1550,13 @@
 
     function openAddAssetWizard() { isEditMode = false; document.getElementById('w_assetNo').readOnly = false; document.getElementById('wizardAssetForm').reset(); currentWizardStep = 1; updateWizardStepUI(); document.getElementById('addAssetWizardModal').classList.remove('hidden'); }
     function closeAddAssetWizard() { document.getElementById('addAssetWizardModal').classList.add('hidden'); }
-    function openBatchQrStatusModal() { document.getElementById('batchQrModal').classList.remove('hidden'); qrCurrentPage = 1; qrPrintList = Array.from(selectedAssetNos).length > 0 ? Array.from(selectedAssetNos) : filteredAssets.slice(0, 28).map(i => i.assetNo); if(qrPrintList.length === 0) return alert('กรุณาเลือกรายการที่ต้องการพิมพ์ QR Code'); renderQrModalPage(); }
+    function openBatchQrStatusModal() { document.getElementById('batchQrModal').classList.remove('hidden'); qrCurrentPage = 1;
+      qrPrintList = Array.from(selectedAssetNos).length > 0 ? Array.from(selectedAssetNos) : filteredAssets.slice(0, 28).map(i => i.assetNo); if(qrPrintList.length === 0) return alert('กรุณาเลือกรายการที่ต้องการพิมพ์ QR Code'); renderQrModalPage();
+    }
     function closeBatchQrModal() { document.getElementById('batchQrModal').classList.add('hidden'); }
     function showAssetDetail(index) {
-      const item = assetDataCache[index]; if (!item) return;
+      const item = assetDataCache[index];
+      if (!item) return;
       let lifeInfo = calculateRemainingLife(item.receivedDate, item.usefulLifeYear, item.usefulLifeMonth);
       document.getElementById('assetDetailContent').innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
@@ -1587,7 +1574,55 @@
       document.getElementById('assetDetailModal').classList.remove('hidden');
     }
     function closeAssetDetail() { document.getElementById('assetDetailModal').classList.add('hidden'); }
-    function startAuditSession() { playAudio('success'); document.getElementById('auditResultsArea').classList.remove('hidden'); document.getElementById('auditLogList').innerHTML = `<div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"><i class="ri-checkbox-circle-line me-1"></i> เริ่มต้นรอบการตรวจนับสต็อกสำเร็จ! พร้อมสแกน QR Code ตรวจนับ</div>`; }
+    function startAuditSession() { playAudio('success'); document.getElementById('auditResultsArea').classList.remove('hidden');
+      document.getElementById('auditLogList').innerHTML = `<div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"><i class="ri-checkbox-circle-line me-1"></i> เริ่มต้นรอบการตรวจนับสต็อกสำเร็จ! พร้อมสแกน QR Code ตรวจนับ</div>`;
+    }
+    function filterP10DocsTable() {
+      const statusFilter = document.getElementById('filterP10DocStatus').value;
+      const tbody = document.getElementById('p10DocsTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      
+      const filtered = p10DocsCache.filter(d => !statusFilter || d.docStatus === statusFilter);
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">ไม่พบรายการเอกสาร พ.10</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(doc => {
+        let statusBadge = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+        if (doc.docStatus === 'ส่งคืนสำเร็จ') statusBadge = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+        else if (doc.docStatus === 'ส่งคืนแล้วแต่ไม่ครบ') statusBadge = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-900/50">
+            <td class="p-3 font-bold text-white">${doc.docNo || doc.p10running || ''}</td>
+            <td class="p-3 text-slate-300">${doc.type === 'BORROW' ? 'ยืมใช้งาน' : (doc.type === 'TRANSFER' ? 'โอนย้าย' : 'ส่งคืน')}</td>
+            <td class="p-3 text-emerald-400 font-semibold">${doc.toAgency || '-'}</td>
+            <td class="p-3">${(doc.items || []).length} รายการ</td>
+            <td class="p-3"><span class="px-2.5 py-0.5 rounded-full text-[10px] border font-semibold ${statusBadge}">${doc.docStatus || 'ยืมใช้งานอยู่'}</span></td>
+            <td class="p-3 text-slate-400 text-[10px]">${new Date(doc.createdAt).toLocaleString('th-TH')}</td>
+            <td class="p-3 text-right">
+              <button onclick="openP10DetailModal('${doc.docNo}')" class="px-2.5 py-1 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg font-semibold text-[10px]">
+                <i class="ri-file-search-line me-1"></i> ดูรายละเอียด
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function applyStatusFilters() {
+      const query = document.getElementById('statusSearchInput').value.toLowerCase();
+      statusFilteredAssets = assetDataCache.filter(item => 
+        !query ||
+        (item.assetNo && String(item.assetNo).toLowerCase().includes(query)) ||
+        (item.description1 && item.description1.toLowerCase().includes(query)) ||
+        (item.current_status && item.current_status.toLowerCase().includes(query))
+      );
+      statusCurrentPageNum = 1;
+      renderStatusPaginatedTable();
+    }
   </script>
 </body>
 </html>
