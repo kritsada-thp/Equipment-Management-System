@@ -310,9 +310,18 @@
           </div>
 
           <div class="flex items-center gap-2 flex-wrap w-full md:w-auto">
-            <select id="filterAssetClass" onchange="applyFilters()" class="px-3 py-2 rounded-xl glass-input text-xs w-full md:w-48">
-              <option value="">-- ทุกประเภทสินทรัพย์ --</option>
-            </select>
+            <select id="filterAssetClass" onchange="applyFilters()" class="px-3 py-2 rounded-xl glass-input text-xs w-full md:w-40">
+  <option value="">-- ทุกประเภท --</option>
+          </select>
+          <!-- เพิ่มตัวกรองสถานะปฏิบัติงานตรงนี้ -->
+          <select id="filterOpStatus" onchange="applyFilters()" class="px-3 py-2 rounded-xl glass-input text-xs w-full md:w-40">
+            <option value="">-- ทุกสถานะ --</option>
+            <option value="ใช้งานปกติ">ใช้งานปกติ</option>
+            <option value="ถูกยืม">ถูกยืม / โอนย้าย</option>
+            <option value="ซ่อม">ซ่อมแซม</option>
+            <option value="ตัด">ตัดจำหน่าย</option>
+          </select>
+          <input type="text" id="searchTableInput" onkeyup="applyFilters()" placeholder="ค้นหาตามเลขสินทรัพย์..." class="px-3.5 py-2 rounded-xl glass-input text-xs w-full md:w-52">
             <input type="text" id="searchTableInput" onkeyup="applyFilters()" placeholder="ค้นหาตามเลขสินทรัพย์, คำอธิบาย..." class="px-3.5 py-2 rounded-xl glass-input text-xs w-full md:w-52">
             
             <button onclick="openAddAssetWizard()" class="flex-1 md:flex-none px-3.5 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1">
@@ -519,9 +528,17 @@
 
           <div class="overflow-x-auto pt-2 hide-scrollbar">
             <div class="p-3 bg-slate-900/80 rounded-t-xl border-b border-slate-800 flex justify-between items-center text-xs flex-wrap gap-2">
-              <input type="text" id="statusSearchInput" onkeyup="applyStatusFilters()" placeholder="ค้นหาครุภัณฑ์..." class="px-3 py-1.5 rounded-xl glass-input text-xs w-full md:w-60">
-              <span id="statusSelectCount" class="text-red-400 font-bold">เลือกอยู่ 0 รายการ</span>
-            </div>
+              <div class="flex items-center gap-2 w-full md:w-auto">
+  <select id="filterStatusTab" onchange="applyStatusFilters()" class="px-3 py-1.5 rounded-xl glass-input text-xs w-full md:w-40">
+    <option value="">-- ทุกสถานะ --</option>
+    <option value="ใช้งานปกติ">ใช้งานปกติ</option>
+    <option value="ถูกยืม">ถูกยืมใช้งาน</option>
+    <option value="ซ่อม">ชำรุดซ่อมได้</option>
+    <option value="ตัด">ตัดจำหน่าย</option>
+  </select>
+  <input type="text" id="statusSearchInput" onkeyup="applyStatusFilters()" placeholder="ค้นหาครุภัณฑ์..." class="px-3 py-1.5 rounded-xl glass-input text-xs w-full md:w-60">
+</div>
+<span id="statusSelectCount" class="text-red-400 font-bold">เลือกอยู่ 0 รายการ</span>
             <table class="w-full min-w-[800px] text-left text-xs text-slate-300">
               <thead class="bg-slate-900/90 uppercase text-[10px] font-bold text-slate-400 border-b border-slate-800">
                 <tr>
@@ -973,23 +990,27 @@
       });
     }
 
-    function applyFilters() {
-      const query = document.getElementById('searchTableInput').value.toLowerCase();
-      const selectedClass = document.getElementById('filterAssetClass').value;
-      filteredAssets = assetDataCache.filter(item => {
-        const isActiveStatus = !item.current_status.includes('โอนย้ายแล้ว') && !item.current_status.includes('ตัดจำหน่ายเรียบร้อย');
-        const matchQuery = !query || 
-          (item.assetNo && String(item.assetNo).toLowerCase().includes(query)) ||
-          (item.description1 && item.description1.toLowerCase().includes(query)) ||
-          (item.costCenter && item.costCenter.toLowerCase().includes(query)) ||
-          (item.current_status && item.current_status.toLowerCase().includes(query));
-        const matchClass = !selectedClass || item.assetClass === selectedClass;
-        return isActiveStatus && matchQuery && matchClass;
-      });
-      document.getElementById('filteredTotalBadge').innerText = `${filteredAssets.length} รายการ`;
-      currentPageNum = 1;
-      renderPaginatedTable();
-    }
+    // อัปเดตฟังก์ชันค้นหาในหน้ารายการหลัก (รองรับกรองสถานะ)
+function applyFilters() {
+  const query = document.getElementById('searchTableInput').value.toLowerCase();
+  const selectedClass = document.getElementById('filterAssetClass').value;
+  const selectedOpStatus = document.getElementById('filterOpStatus').value;
+
+  filteredAssets = assetDataCache.filter(item => {
+    const matchQuery = !query || 
+      (item.assetNo && String(item.assetNo).toLowerCase().includes(query)) ||
+      (item.description1 && item.description1.toLowerCase().includes(query)) ||
+      (item.costCenter && item.costCenter.toLowerCase().includes(query));
+    const matchClass = !selectedClass || item.assetClass === selectedClass;
+    const matchOpStatus = !selectedOpStatus || (item.current_status && item.current_status.includes(selectedOpStatus));
+    
+    // ตัดการซ่อนของตัดจำหน่ายออก เพื่อให้แอดมินค้นหาและดึงคืนได้
+    return matchQuery && matchClass && matchOpStatus;
+  });
+  document.getElementById('filteredTotalBadge').innerText = `${filteredAssets.length} รายการ`;
+  currentPageNum = 1;
+  renderPaginatedTable();
+}
 
     // ==========================================
 // 4. แก้ไขปุ่มในตารางหลัก ให้มีปุ่ม "คืนสภาพ" กรณีกดตัดจำหน่ายผิด
@@ -1604,18 +1625,66 @@ function renderCart() {
       });
     }
 
-    function applyStatusFilters() {
-      const query = document.getElementById('statusSearchInput').value.toLowerCase();
-      statusFilteredAssets = assetDataCache.filter(item => 
-        !query ||
-        (item.assetNo && String(item.assetNo).toLowerCase().includes(query)) ||
-        (item.description1 && item.description1.toLowerCase().includes(query)) ||
-        (item.current_status && item.current_status.toLowerCase().includes(query))
-      );
-      statusCurrentPageNum = 1;
-      renderStatusPaginatedTable();
-    }
-    
+    // อัปเดตฟังก์ชันค้นหาในหน้าปรับสถานะ (Tab 3) (รองรับกรองสถานะ)
+function applyStatusFilters() {
+  const query = document.getElementById('statusSearchInput').value.toLowerCase();
+  const selectedStatus = document.getElementById('filterStatusTab').value;
+
+  statusFilteredAssets = assetDataCache.filter(item => {
+    const matchQuery = !query ||
+      (item.assetNo && String(item.assetNo).toLowerCase().includes(query)) ||
+      (item.description1 && item.description1.toLowerCase().includes(query));
+    const matchStatus = !selectedStatus || (item.current_status && item.current_status.includes(selectedStatus));
+    return matchQuery && matchStatus;
+  });
+  statusCurrentPageNum = 1;
+  renderStatusPaginatedTable();
+}
+    // ฟังก์ชันพิมพ์ PDF ที่หายไป
+function printCurrentP10Pdf() {
+  if (!activeP10Doc) return;
+  const doc = activeP10Doc;
+  const printArea = document.getElementById('printableArea');
+  
+  printArea.innerHTML = `
+    <div style="padding: 20px; font-family: Sarabun, sans-serif; color: black; background: white;">
+      <h2 style="text-align: center; margin-bottom: 5px;">ใบส่งของ (พ.10)</h2>
+      <p style="text-align: center; font-size: 12px; margin-top: 0;">ฝ่ายบริการธุรกิจขนส่งและโลจิสติกส์</p>
+      <hr style="border: 1px solid black; margin: 15px 0;">
+      <table style="width: 100%; font-size: 12px; margin-bottom: 15px;">
+        <tr>
+          <td><strong>เลขที่เอกสาร:</strong> ${doc.docNo || doc.p10running}</td>
+          <td style="text-align: right;"><strong>ลงวันที่:</strong> ${new Date(doc.createdAt).toLocaleDateString('th-TH')}</td>
+        </tr>
+        <tr>
+          <td><strong>ถึงหน่วยงาน:</strong> ${doc.toAgency || '-'} (${doc.postCode || ''})</td>
+          <td style="text-align: right;"><strong>ประเภท:</strong> ${doc.type === 'BORROW' ? 'ยืมใช้งาน' : (doc.type === 'TRANSFER' ? 'โอนย้าย' : 'ส่งคืน')}</td>
+        </tr>
+      </table>
+      <table style="width: 100%; border-collapse: collapse; font-size: 12px;" border="1">
+        <thead>
+          <tr style="background: #f1f5f9;">
+            <th style="padding: 6px; border: 1px solid black;">ลำดับ</th>
+            <th style="padding: 6px; border: 1px solid black;">รายการครุภัณฑ์</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${(doc.items || []).map((item, idx) => {
+            const assetNo = typeof item === 'object' ? item.assetNo : item;
+            const assetObj = assetDataCache.find(x => x.assetNo === assetNo) || {};
+            return `
+              <tr>
+                <td style="padding: 6px; border: 1px solid black; text-align: center;">${idx + 1}</td>
+                <td style="padding: 6px; border: 1px solid black;">${assetNo} - ${assetObj.description1 || ''}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+  html2pdf().from(printArea).save(`${doc.docNo || doc.p10running}.pdf`);
+}
     function changeQrPage(delta) {
       qrCurrentPage += delta;
       renderQrModalPage();
@@ -2065,9 +2134,7 @@ function openP10DetailModal(docNo) {
 }
 
 function closeP10DetailModal() { document.getElementById('p10DetailModal').classList.add('hidden'); }
-    // ==========================================
-// 3. ฟังก์ชันประมวลผลการรับคืน (Return Checkbox Logic)
-// ==========================================
+// อัปเดตตรรกะการรับคืน พ.10 ให้แสดง "รับคืนไม่ครบ" ทันที
 async function processReturnP10Items() {
     if (!activeP10Doc) return;
     const doc = activeP10Doc;
@@ -2075,7 +2142,6 @@ async function processReturnP10Items() {
     let totalItems = (doc.items || []).length;
     let alreadyReturnedCount = 0;
 
-    // รวบรวม Item ที่ถูกติ๊ก Checkbox (ข้ามตัวที่โดน Disable ไปแล้ว)
     (doc.items || []).forEach((itemId, idx) => {
         const chk = document.getElementById('return_chk_' + idx);
         const assetNo = typeof itemId === 'object' ? itemId.assetNo : itemId;
@@ -2096,33 +2162,29 @@ async function processReturnP10Items() {
     showSpinner(true, 'กำลังบันทึกข้อมูลการรับคืน...');
 
     try {
-        // 1. เปลี่ยนสถานะ Asset ที่ถูกติ๊กให้กลับเป็น 'ใช้งานปกติ'
         if (selectedToReturn.length > 0) {
             await callGAS("updateAssetOperationalStatus", {
-                assetNoList: selectedToReturn, 
-                status: "ใช้งานปกติ", 
-                holder: "-", // ลบชื่อคนถือครองออก
-                remarks: `รับคืนจากใบ พ.10: ${doc.docNo || doc.p10running}`, 
-                imageBase64: null, fileName: '', 
-                userEmail: currentUser ? currentUser.email : "Staff"
+                assetNoList: selectedToReturn, status: "ใช้งานปกติ", holder: "-", remarks: `รับคืนจากใบ พ.10: ${doc.docNo || doc.p10running}`, 
+                imageBase64: null, fileName: '', userEmail: currentUser ? currentUser.email : "Staff"
             });
         }
 
-        // 2. ประเมินสถานะของใบ พ.10 ภาพรวม
         let newReturnedCount = alreadyReturnedCount + selectedToReturn.length;
         let newDocStatus = doc.docStatus;
 
-        if (newReturnedCount === totalItems && totalItems > 0) newDocStatus = "ส่งคืนสำเร็จ"; // คืนครบ 100%
-        else if (newReturnedCount > 0 && newReturnedCount < totalItems) newDocStatus = "ส่งคืนแล้วแต่ไม่ครบ"; // คืนแค่บางส่วน
+        if (newReturnedCount === totalItems && totalItems > 0) newDocStatus = "ส่งคืนสำเร็จ"; 
+        else if (newReturnedCount > 0 && newReturnedCount < totalItems) newDocStatus = "ส่งคืนแล้วแต่ไม่ครบ"; 
 
-        // 3. บันทึกกลับลงเอกสาร พ.10
         await callGAS("updateP10DocStatus", { 
             docNo: doc.docNo || doc.p10running, docStatus: newDocStatus, statusRemarks: remarks 
         });
 
         showSpinner(false); playAudio('success'); alert('อัปเดตการรับคืนสำเร็จ!');
         await loadAssetData(); 
-        openP10DetailModal(doc.docNo || doc.p10running); 
+        
+        // รีโหลดสถานะ Modal ใหม่ทันที
+        const updatedDoc = p10DocsCache.find(x => x.docNo === (doc.docNo || doc.p10running));
+        if (updatedDoc) openP10DetailModal(updatedDoc.docNo || updatedDoc.p10running); 
     } catch (err) {
         showSpinner(false); alert('เกิดข้อผิดพลาด: ' + err.message);
     }
