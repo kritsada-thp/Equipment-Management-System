@@ -837,14 +837,31 @@
     function handleLogout() { firebase.auth().signOut(); }
 
     function showSpinner(show, text = 'กำลังประมวลผล...', progressData = null) {
-      const overlay = document.getElementById('loadingOverlay');
-      if (show) {
-        document.getElementById('loadingText').innerText = text;
-        overlay.classList.remove('hidden');
-      } else {
-        overlay.classList.add('hidden');
-      }
+  const overlay = document.getElementById('loadingOverlay');
+  const textEl = document.getElementById('loadingText');
+  const container = document.getElementById('progressBarContainer');
+  const fill = document.getElementById('progressBarFill');
+  const percentEl = document.getElementById('progressPercent');
+  const counterEl = document.getElementById('progressCounter');
+
+  if (show) {
+    textEl.innerText = text;
+    overlay.classList.remove('hidden');
+
+    if (progressData) {
+      container.classList.remove('hidden');
+      const pct = Math.round((progressData.current / progressData.total) * 100);
+      fill.style.width = pct + '%';
+      percentEl.innerText = pct + '%';
+      counterEl.innerText = `${progressData.current} / ${progressData.total} รายการ`;
+    } else {
+      container.classList.add('hidden');
     }
+  } else {
+    overlay.classList.add('hidden');
+    container.classList.add('hidden');
+  }
+}
 
     function playAudio(type) {
       try {
@@ -1229,52 +1246,38 @@ async function submitStatusUpdateForm() {
   const arr = Array.from(statusSelectedAssetNos);
   if (arr.length === 0) return alert('กรุณาเลือกรายการที่ต้องการอัปเดต');
   const newStatus = document.getElementById('status_newStatus').value;
+
+  // 🛑 เพิ่มระบบตรวจสอบ: ห้ามตัดจำหน่ายหากยัง "ถูกยืม" 🛑
+  if (newStatus.includes('ตัดจำหน่าย')) {
+    for (let assetNo of arr) {
+      const item = assetDataCache.find(x => x.assetNo === assetNo);
+      // หากพบคำว่า "ยืม" ในสถานะปัจจุบัน ให้บล็อกการทำงานทันที
+      if (item && item.current_status && item.current_status.includes('ยืม')) {
+        return alert(`❌ ไม่สามารถตัดจำหน่ายได้\n\nครุภัณฑ์เลขที่: ${assetNo}\nยังอยู่ในสถานะ "ถูกยืมใช้งาน"\nกรุณาทำรายการรับคืนให้เรียบร้อยก่อนทำการตัดจำหน่าย`);
+      }
+    }
+  }
+
   const fileInput = document.getElementById('status_attachmentFile');
+  showSpinner(true, `กำลังดำเนินการ ${arr.length} รายการ...`);
 
   const proceedSubmit = async (imageBase64 = null) => {
-    // โชว์ Progress Bar อิงตามจำนวนทั้งหมดที่เลือก
-    showSpinner(true, `กำลังดำเนินการ ${arr.length} รายการ...`, { current: 0, total: arr.length });
-    
-    const chunkSize = 50; // หั่นข้อมูลทีละ 50 รายการ ส่งไป Apps Script ไม่ให้เกินขีดจำกัด
-    let successCount = 0;
-
     try {
-      for (let i = 0; i < arr.length; i += chunkSize) {
-        const chunk = arr.slice(i, i + chunkSize);
-        
-        const res = await callGAS("updateAssetOperationalStatus", {
-          assetNoList: chunk, status: newStatus, holder: "-", remarks: "-", 
-          imageBase64: imageBase64, fileName: 'location_img', userEmail: currentUser ? currentUser.email : "Staff"
-        });
-
-        successCount += (res.count || chunk.length);
-        
-        // อัปเดต Progress Bar ทุกรอบที่ส่งสำเร็จ
-        showSpinner(true, `กำลังดำเนินการ ${arr.length} รายการ...`, { current: successCount, total: arr.length });
-      }
-
-      showSpinner(false); 
-      playAudio('success'); 
-      alert(`อัปเดตสถานะสำเร็จ ${successCount} รายการ`);
-      
-      statusSelectedAssetNos.clear(); 
-      if(fileInput) fileInput.value = ''; 
-      loadAssetData(); // โหลดตารางใหม่
-      
-    } catch (err) { 
-      showSpinner(false); alert('เกิดข้อผิดพลาด: ' + err.message); 
-    }
+      const res = await callGAS("updateAssetOperationalStatus", {
+        assetNoList: arr, status: newStatus, holder: "-", remarks: "-", 
+        imageBase64: imageBase64, fileName: 'location_img', userEmail: currentUser ? currentUser.email : "Staff"
+      });
+      showSpinner(false); playAudio('success'); alert(`สำเร็จ ${res.count} รายการ`);
+      statusSelectedAssetNos.clear(); if(fileInput) fileInput.value = ''; loadAssetData();
+    } catch (err) { showSpinner(false); alert(err.message); }
   };
 
   if (fileInput && fileInput.files.length > 0) {
     const reader = new FileReader();
     reader.onload = function(evt) { proceedSubmit(evt.target.result); };
     reader.readAsDataURL(fileInput.files[0]);
-  } else { 
-    proceedSubmit(null); 
-  }
+  } else { proceedSubmit(null); }
 }
-
     async function markAsPendingDisposal(assetNoList) {
        if(!confirm('ยืนยันตั้งเป็น "รอตัดจำหน่าย" จำนวน ' + assetNoList.length + ' รายการ?')) return;
        showSpinner(true, 'กำลังอัปเดต...');
@@ -1668,18 +1671,24 @@ function applyStatusFilters() {
   statusCurrentPageNum = 1;
   renderStatusPaginatedTable();
 }
-    // ฟังก์ชันพิมพ์ PDF ที่หายไป
+// ฟังก์ชันปิดหน้าต่างประวัติที่หายไป
+function closeStatusHistoryModal() {
+  document.getElementById('statusHistoryModal').classList.add('hidden');
+}
+
+// ฟังก์ชันพิมพ์ PDF ฉบับแก้ไขให้ Canvas อ่านความสูงได้สมบูรณ์
 function printCurrentP10Pdf() {
   if (!activeP10Doc) return;
   const doc = activeP10Doc;
   const printArea = document.getElementById('printableArea');
   
   printArea.innerHTML = `
-    <div style="padding: 20px; font-family: Sarabun, sans-serif; color: black; background: white;">
-      <h2 style="text-align: center; margin-bottom: 5px;">ใบส่งของ (พ.10)</h2>
-      <p style="text-align: center; font-size: 12px; margin-top: 0;">ฝ่ายบริการธุรกิจขนส่งและโลจิสติกส์</p>
+    <div id="p10ExportArea" style="padding: 40px; font-family: 'Sarabun', sans-serif; color: black; background: white; width: 210mm; box-sizing: border-box;">
+      <h2 style="text-align: center; margin-bottom: 5px; font-weight: bold;">ใบส่งของ (พ.10)</h2>
+      <p style="text-align: center; font-size: 14px; margin-top: 0;">ฝ่ายบริการธุรกิจขนส่งและโลจิสติกส์</p>
       <hr style="border: 1px solid black; margin: 15px 0;">
-      <table style="width: 100%; font-size: 12px; margin-bottom: 15px;">
+      
+      <table style="width: 100%; font-size: 14px; margin-bottom: 20px;">
         <tr>
           <td><strong>เลขที่เอกสาร:</strong> ${doc.docNo || doc.p10running}</td>
           <td style="text-align: right;"><strong>ลงวันที่:</strong> ${new Date(doc.createdAt).toLocaleDateString('th-TH')}</td>
@@ -1689,11 +1698,13 @@ function printCurrentP10Pdf() {
           <td style="text-align: right;"><strong>ประเภท:</strong> ${doc.type === 'BORROW' ? 'ยืมใช้งาน' : (doc.type === 'TRANSFER' ? 'โอนย้าย' : 'ส่งคืน')}</td>
         </tr>
       </table>
-      <table style="width: 100%; border-collapse: collapse; font-size: 12px;" border="1">
+
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px;" border="1">
         <thead>
           <tr style="background: #f1f5f9;">
-            <th style="padding: 6px; border: 1px solid black;">ลำดับ</th>
-            <th style="padding: 6px; border: 1px solid black;">รายการครุภัณฑ์</th>
+            <th style="padding: 10px; border: 1px solid black; width: 10%; text-align: center;">ลำดับ</th>
+            <th style="padding: 10px; border: 1px solid black; width: 20%; text-align: center;">รหัสครุภัณฑ์</th>
+            <th style="padding: 10px; border: 1px solid black; width: 70%; text-align: left;">รายการครุภัณฑ์</th>
           </tr>
         </thead>
         <tbody>
@@ -1702,16 +1713,51 @@ function printCurrentP10Pdf() {
             const assetObj = assetDataCache.find(x => x.assetNo === assetNo) || {};
             return `
               <tr>
-                <td style="padding: 6px; border: 1px solid black; text-align: center;">${idx + 1}</td>
-                <td style="padding: 6px; border: 1px solid black;">${assetNo} - ${assetObj.description1 || ''}</td>
+                <td style="padding: 8px; border: 1px solid black; text-align: center;">${idx + 1}</td>
+                <td style="padding: 8px; border: 1px solid black; text-align: center;">${assetNo}</td>
+                <td style="padding: 8px; border: 1px solid black;">${assetObj.description1 || '-'}</td>
               </tr>
             `;
           }).join('')}
         </tbody>
       </table>
+
+      <div style="margin-top: 60px; display: flex; justify-content: space-between; font-size: 14px;">
+        <div style="text-align: center; width: 45%;">
+          <p>ลงชื่อ...................................................ผู้ส่ง</p>
+          <p>(${doc.userEmail || 'เจ้าหน้าที่'})</p>
+        </div>
+        <div style="text-align: center; width: 45%;">
+          <p>ลงชื่อ...................................................ผู้รับ</p>
+          <p>(${doc.toAgency || 'ผู้รับสิ่งของ'})</p>
+        </div>
+      </div>
     </div>
   `;
-  html2pdf().from(printArea).save(`${doc.docNo || doc.p10running}.pdf`);
+
+  // เทคนิคเลี่ยงหน้าขาว: ปลดล็อก hidden แล้วดัน Layer ออกไปนอกจอชั่วคราว
+  printArea.classList.remove('hidden');
+  printArea.style.display = 'block';
+  printArea.style.position = 'absolute';
+  printArea.style.top = '-9999px';
+  printArea.style.left = '-9999px';
+
+  const element = document.getElementById('p10ExportArea');
+  const opt = {
+    margin:       [10, 0, 10, 0],
+    filename:     `${doc.docNo || doc.p10running}.pdf`,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  showSpinner(true, 'กำลังสร้างไฟล์ PDF...');
+
+  html2pdf().set(opt).from(element).save().then(() => {
+    printArea.innerHTML = '';
+    printArea.style.display = 'none';
+    showSpinner(false);
+  });
 }
     function changeQrPage(delta) {
       qrCurrentPage += delta;
