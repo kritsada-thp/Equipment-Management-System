@@ -116,14 +116,14 @@
           <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">อีเมลผู้ใช้งาน</label>
           <div class="relative">
             <i class="ri-mail-line absolute left-3 top-2.5 text-slate-400"></i>
-            <input type="email" id="loginEmail" required class="w-full pl-10 pr-4 py-2.5 rounded-xl glass-input text-sm" placeholder="user@thailandpost.com">
+            <input type="email" id="loginEmail" autocomplete="username" required class="w-full pl-10 pr-4 py-2.5 rounded-xl glass-input text-sm" placeholder="user@thailandpost.com">
           </div>
         </div>
         <div>
           <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">รหัสผ่าน</label>
           <div class="relative">
             <i class="ri-lock-line absolute left-3 top-2.5 text-slate-400"></i>
-            <input type="password" id="loginPassword" required class="w-full pl-10 pr-10 py-2.5 rounded-xl glass-input text-sm" placeholder="••••••••">
+            <input type="password" id="loginPassword" autocomplete="current-password" required class="w-full pl-10 pr-10 py-2.5 rounded-xl glass-input text-sm" placeholder="••••••••">
             <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-2.5 text-slate-400 hover:text-white transition-colors">
                 <i id="eyeIcon" class="ri-eye-off-line text-lg"></i>
             </button>
@@ -236,6 +236,7 @@
         </div>
       </header>
 
+      <!-- VIEW 1: DASHBOARD -->
       <div id="dashboardView" class="page-fade space-y-6 hidden">
         <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
           <div class="glass-card p-4 rounded-2xl col-span-2 md:col-span-1 border border-slate-800">
@@ -300,6 +301,7 @@
         </div>
       </div>
 
+      <!-- VIEW 2: ASSET LIST TABLE -->
       <div id="assetListView" class="page-fade space-y-4">
         <div class="glass-card p-4 md:p-5 rounded-2xl flex flex-wrap items-center justify-between gap-4">
           <div class="flex items-center gap-3 w-full md:w-auto justify-between">
@@ -311,17 +313,15 @@
 
           <div class="flex items-center gap-2 flex-wrap w-full md:w-auto">
             <select id="filterAssetClass" onchange="applyFilters()" class="px-3 py-2 rounded-xl glass-input text-xs w-full md:w-40">
-  <option value="">-- ทุกประเภท --</option>
-          </select>
-          <!-- เพิ่มตัวกรองสถานะปฏิบัติงานตรงนี้ -->
-          <select id="filterOpStatus" onchange="applyFilters()" class="px-3 py-2 rounded-xl glass-input text-xs w-full md:w-40">
-            <option value="">-- ทุกสถานะ --</option>
-            <option value="ใช้งานปกติ">ใช้งานปกติ</option>
-            <option value="ถูกยืม">ถูกยืม / โอนย้าย</option>
-            <option value="ซ่อม">ซ่อมแซม</option>
-            <option value="ตัด">ตัดจำหน่าย</option>
-          </select>
-          <input type="text" id="searchTableInput" onkeyup="applyFilters()" placeholder="ค้นหาตามเลขสินทรัพย์..." class="px-3.5 py-2 rounded-xl glass-input text-xs w-full md:w-52">
+              <option value="">-- ทุกประเภท --</option>
+            </select>
+            <select id="filterOpStatus" onchange="applyFilters()" class="px-3 py-2 rounded-xl glass-input text-xs w-full md:w-40">
+              <option value="">-- ทุกสถานะ --</option>
+              <option value="ใช้งานปกติ">ใช้งานปกติ</option>
+              <option value="ถูกยืม">ถูกยืม / โอนย้าย</option>
+              <option value="ซ่อม">ซ่อมแซม</option>
+              <option value="ตัด">ตัดจำหน่าย</option>
+            </select>
             <input type="text" id="searchTableInput" onkeyup="applyFilters()" placeholder="ค้นหาตามเลขสินทรัพย์, คำอธิบาย..." class="px-3.5 py-2 rounded-xl glass-input text-xs w-full md:w-52">
             
             <button onclick="openAddAssetWizard()" class="flex-1 md:flex-none px-3.5 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1">
@@ -394,8 +394,8 @@
         </div>
       </div>
 
+      <!-- VIEW 3: CARD MENU TABS -->
       <div id="assetStatusView" class="page-fade space-y-6 hidden">
-        
         <div class="flex items-center gap-2 border-b border-slate-800 pb-3 overflow-x-auto hide-scrollbar snap-x">
           <button id="tabBtn1" onclick="switchStatusTab(1)" class="px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shrink-0 snap-start transition-all">
             <i class="ri-folder-history-line"></i> 1. รายการ พ.10
@@ -529,16 +529,17 @@
           <div class="overflow-x-auto pt-2 hide-scrollbar">
             <div class="p-3 bg-slate-900/80 rounded-t-xl border-b border-slate-800 flex justify-between items-center text-xs flex-wrap gap-2">
               <div class="flex items-center gap-2 w-full md:w-auto">
-  <select id="filterStatusTab" onchange="applyStatusFilters()" class="px-3 py-1.5 rounded-xl glass-input text-xs w-full md:w-40">
-    <option value="">-- ทุกสถานะ --</option>
-    <option value="ใช้งานปกติ">ใช้งานปกติ</option>
-    <option value="ถูกยืม">ถูกยืมใช้งาน</option>
-    <option value="ซ่อม">ชำรุดซ่อมได้</option>
-    <option value="ตัด">ตัดจำหน่าย</option>
-  </select>
-  <input type="text" id="statusSearchInput" onkeyup="applyStatusFilters()" placeholder="ค้นหาครุภัณฑ์..." class="px-3 py-1.5 rounded-xl glass-input text-xs w-full md:w-60">
-</div>
-<span id="statusSelectCount" class="text-red-400 font-bold">เลือกอยู่ 0 รายการ</span>
+                <select id="filterStatusTab" onchange="applyStatusFilters()" class="px-3 py-1.5 rounded-xl glass-input text-xs w-full md:w-40">
+                  <option value="">-- ทุกสถานะ --</option>
+                  <option value="ใช้งานปกติ">ใช้งานปกติ</option>
+                  <option value="ถูกยืม">ถูกยืมใช้งาน</option>
+                  <option value="ซ่อม">ชำรุดซ่อมได้</option>
+                  <option value="ตัด">ตัดจำหน่าย</option>
+                </select>
+                <input type="text" id="statusSearchInput" onkeyup="applyStatusFilters()" placeholder="ค้นหาครุภัณฑ์..." class="px-3 py-1.5 rounded-xl glass-input text-xs w-full md:w-60">
+              </div>
+              <span id="statusSelectCount" class="text-red-400 font-bold">เลือกอยู่ 0 รายการ</span>
+            </div>
             <table class="w-full min-w-[800px] text-left text-xs text-slate-300">
               <thead class="bg-slate-900/90 uppercase text-[10px] font-bold text-slate-400 border-b border-slate-800">
                 <tr>
@@ -555,22 +556,16 @@
             </table>
           </div>
 
-          <div class="p-3 bg-slate-900/90 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
-            <div class="flex items-center gap-2">
-              <span class="text-slate-400">แสดงหน้าละ</span>
-              <select id="statusPageSizeSelect" onchange="changeStatusPageSize()" class="px-2 py-1 rounded-lg glass-input text-xs">
-                <option value="15" selected>15</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </select>
-            </div>
-            <div class="flex items-center gap-3">
-              <span id="statusPaginationInfo" class="text-slate-400 font-medium hidden md:block">แสดง 0 - 0 จาก 0 รายการ</span>
-              <div class="flex items-center gap-1">
-                <button id="btnStatusPrevPage" onclick="changeStatusPage(-1)" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg disabled:opacity-40" disabled><i class="ri-arrow-left-s-line text-lg"></i></button>
-                <span id="statusPageNumberDisplay" class="px-3 py-1 bg-slate-950 rounded-lg text-white font-bold border border-slate-800">1 / 1</span>
-                <button id="btnStatusNextPage" onclick="changeStatusPage(1)" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg disabled:opacity-40" disabled><i class="ri-arrow-right-s-line text-lg"></i></button>
-              </div>
+          <div class="p-3 bg-slate-900/90 border-t border-slate-800 flex items-center justify-between text-xs">
+            <select id="statusPageSizeSelect" onchange="changeStatusPageSize()" class="px-2 py-1 rounded-lg glass-input text-xs">
+              <option value="15" selected>15</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+            <div class="flex items-center gap-1">
+              <button id="btnStatusPrevPage" onclick="changeStatusPage(-1)" class="p-1.5 bg-slate-800 text-slate-300 rounded-lg"><i class="ri-arrow-left-s-line"></i></button>
+              <span id="statusPageNumberDisplay" class="px-3 py-1 bg-slate-950 rounded-lg text-white font-bold">1 / 1</span>
+              <button id="btnStatusNextPage" onclick="changeStatusPage(1)" class="p-1.5 bg-slate-800 text-slate-300 rounded-lg"><i class="ri-arrow-right-s-line"></i></button>
             </div>
           </div>
         </div>
@@ -590,8 +585,6 @@
         </div>
       </div>
 
-      <div id="printableArea" class="hidden"></div>
-
       <div id="statusHistoryModal" class="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/80 backdrop-blur-md hidden p-4">
         <div class="glass-card w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
           <div class="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
@@ -599,29 +592,6 @@
             <button onclick="closeStatusHistoryModal()" class="text-slate-400 hover:text-white p-1"><i class="ri-close-line text-2xl"></i></button>
           </div>
           <div class="p-5 overflow-y-auto flex-1 space-y-3" id="historyModalContent"></div>
-        </div>
-      </div>
-
-      <div id="batchQrModal" class="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/80 backdrop-blur-md hidden p-4">
-        <div class="glass-card w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-          <div class="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
-            <h4 class="text-sm font-bold text-white"><i class="ri-qr-code-line text-purple-500"></i> พิมพ์ QR Code</h4>
-            <div class="flex gap-2">
-              <button onclick="downloadAllQrPdf()" class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs"><i class="ri-file-download-line"></i> ดาวน์โหลด PDF</button>
-              <button onclick="closeBatchQrModal()" class="text-slate-400 hover:text-white p-1"><i class="ri-close-line text-2xl"></i></button>
-            </div>
-          </div>
-          <div class="px-6 py-3 bg-slate-100 flex justify-between items-center border-b border-slate-300 text-slate-800 text-xs shadow-inner">
-            <span id="qrPaginationInfo" class="font-bold">แสดง 0 - 0 จาก 0</span>
-            <div class="flex gap-2 items-center">
-               <button onclick="changeQrPage(-1)" id="btnQrPrev" class="px-3 py-1.5 bg-slate-300 rounded-lg">ก่อนหน้า</button>
-               <span id="qrPageDisplay" class="px-3 py-1 font-bold border border-slate-300 rounded-lg">1 / 1</span>
-               <button onclick="changeQrPage(1)" id="btnQrNext" class="px-3 py-1.5 bg-slate-300 rounded-lg">ถัดไป</button>
-            </div>
-          </div>
-          <div class="p-6 overflow-y-auto flex-1 bg-white text-slate-900">
-            <div id="qrStatusTagGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-          </div>
         </div>
       </div>
 
@@ -725,8 +695,31 @@
                 นำกล้องจ่อที่ QR Code เพื่อเพิ่มลงใบ พ.10 อัตโนมัติ
              </p>
          </div>
-         <!-- Hidden div for processing fallback images -->
          <div id="dummyQrReader" class="hidden"></div>
+      </div>
+      
+      <!-- BATCH QR Modal เพียง 1 ตัวอยู่ด้านล่างสุด ป้องกันความสับสน -->
+      <div id="batchQrModal" class="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/80 backdrop-blur-md hidden p-4">
+        <div class="glass-card w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+          <div class="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
+            <h4 class="text-sm font-bold text-white"><i class="ri-qr-code-line text-purple-500"></i> พิมพ์ QR Code</h4>
+            <div class="flex gap-2">
+              <button onclick="downloadAllQrPdf()" class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs"><i class="ri-file-download-line"></i> ดาวน์โหลด PDF</button>
+              <button onclick="closeBatchQrModal()" class="text-slate-400 hover:text-white p-1"><i class="ri-close-line text-2xl"></i></button>
+            </div>
+          </div>
+          <div class="px-6 py-3 bg-slate-100 flex justify-between items-center border-b border-slate-300 text-slate-800 text-xs shadow-inner">
+            <span id="qrPaginationInfo" class="font-bold">แสดง 0 - 0 จาก 0</span>
+            <div class="flex gap-2 items-center">
+               <button onclick="changeQrPage(-1)" id="btnQrPrev" class="px-3 py-1.5 bg-slate-300 rounded-lg">ก่อนหน้า</button>
+               <span id="qrPageDisplay" class="px-3 py-1 font-bold border border-slate-300 rounded-lg">1 / 1</span>
+               <button onclick="changeQrPage(1)" id="btnQrNext" class="px-3 py-1.5 bg-slate-300 rounded-lg">ถัดไป</button>
+            </div>
+          </div>
+          <div class="p-6 overflow-y-auto flex-1 bg-white text-slate-900">
+            <div id="qrStatusTagGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          </div>
+        </div>
       </div>
 
     </main>
@@ -837,31 +830,31 @@
     function handleLogout() { firebase.auth().signOut(); }
 
     function showSpinner(show, text = 'กำลังประมวลผล...', progressData = null) {
-  const overlay = document.getElementById('loadingOverlay');
-  const textEl = document.getElementById('loadingText');
-  const container = document.getElementById('progressBarContainer');
-  const fill = document.getElementById('progressBarFill');
-  const percentEl = document.getElementById('progressPercent');
-  const counterEl = document.getElementById('progressCounter');
+      const overlay = document.getElementById('loadingOverlay');
+      const textEl = document.getElementById('loadingText');
+      const container = document.getElementById('progressBarContainer');
+      const fill = document.getElementById('progressBarFill');
+      const percentEl = document.getElementById('progressPercent');
+      const counterEl = document.getElementById('progressCounter');
 
-  if (show) {
-    textEl.innerText = text;
-    overlay.classList.remove('hidden');
+      if (show) {
+        textEl.innerText = text;
+        overlay.classList.remove('hidden');
 
-    if (progressData) {
-      container.classList.remove('hidden');
-      const pct = Math.round((progressData.current / progressData.total) * 100);
-      fill.style.width = pct + '%';
-      percentEl.innerText = pct + '%';
-      counterEl.innerText = `${progressData.current} / ${progressData.total} รายการ`;
-    } else {
-      container.classList.add('hidden');
+        if (progressData) {
+          container.classList.remove('hidden');
+          const pct = Math.round((progressData.current / progressData.total) * 100);
+          fill.style.width = pct + '%';
+          percentEl.innerText = pct + '%';
+          counterEl.innerText = `${progressData.current} / ${progressData.total} รายการ`;
+        } else {
+          container.classList.add('hidden');
+        }
+      } else {
+        overlay.classList.add('hidden');
+        container.classList.add('hidden');
+      }
     }
-  } else {
-    overlay.classList.add('hidden');
-    container.classList.add('hidden');
-  }
-}
 
     function playAudio(type) {
       try {
@@ -900,46 +893,45 @@
 
     function toggleMobileSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
 
-    // อัปเดตฟังก์ชัน switchPage เพื่อบังคับปิด Modal ทั้งหมดเมื่อเปลี่ยนเมนู
-function switchPage(targetPage) {
-  if (currentPage === targetPage) return;
-  
-  // บังคับปิด Modal ทั้งหมดกันการค้าง
-  closeBatchQrModal();
-  closeP10DetailModal();
-  closeStatusHistoryModal();
-  closeAddAssetWizard();
-  closeAssetDetail();
-  closeExpiryModal();
-  
-  const currentEl = document.getElementById(currentPage);
-  const targetEl = document.getElementById(targetPage);
-  if(!targetEl) return;
+    // ปิด Modal ทั้งหมดเพื่อให้เคลียร์หน้าจอเมื่อเปลี่ยนเมนู
+    function switchPage(targetPage) {
+      if (currentPage === targetPage) return;
+      
+      closeBatchQrModal();
+      closeP10DetailModal();
+      closeStatusHistoryModal();
+      closeAddAssetWizard();
+      closeAssetDetail();
+      closeExpiryModal();
+      
+      const currentEl = document.getElementById(currentPage);
+      const targetEl = document.getElementById(targetPage);
+      if(!targetEl) return;
 
-  document.querySelectorAll('nav a').forEach(a => a.classList.remove('bg-red-600/10', 'text-white'));
-  const activeBtn = document.getElementById('menu-' + targetPage);
-  if (activeBtn) activeBtn.classList.add('bg-red-600/10', 'text-white');
+      document.querySelectorAll('nav a').forEach(a => a.classList.remove('bg-red-600/10', 'text-white'));
+      const activeBtn = document.getElementById('menu-' + targetPage);
+      if (activeBtn) activeBtn.classList.add('bg-red-600/10', 'text-white');
 
-  const titles = {
-    dashboardView: { title: '<i class="ri-dashboard-3-line text-red-500"></i> แดชบอร์ด & สถิติ', sub: 'ภาพรวมครุภัณฑ์' },
-    assetListView: { title: '<i class="ri-file-list-3-line text-red-500"></i> รายการทั้งหมด', sub: 'จัดการข้อมูลและตรวจดูครุภัณฑ์' },
-    assetStatusView: { title: '<i class="ri-list-settings-line text-red-500"></i> จัดการสถานะ', sub: 'พ.10 และ ปรับสถานะ' },
-  };
-  if (titles[targetPage]) {
-    document.getElementById('pageTitle').innerHTML = titles[targetPage].title;
-    document.getElementById('pageSubTitle').innerText = titles[targetPage].sub;
-  }
+      const titles = {
+        dashboardView: { title: '<i class="ri-dashboard-3-line text-red-500"></i> แดชบอร์ด & สถิติ', sub: 'ภาพรวมครุภัณฑ์' },
+        assetListView: { title: '<i class="ri-file-list-3-line text-red-500"></i> รายการทั้งหมด', sub: 'จัดการข้อมูลและตรวจดูครุภัณฑ์' },
+        assetStatusView: { title: '<i class="ri-list-settings-line text-red-500"></i> จัดการสถานะ', sub: 'พ.10 และ ปรับสถานะ' },
+      };
+      if (titles[targetPage]) {
+        document.getElementById('pageTitle').innerHTML = titles[targetPage].title;
+        document.getElementById('pageSubTitle').innerText = titles[targetPage].sub;
+      }
 
-  if(currentEl) currentEl.style.opacity = '0';
-  setTimeout(() => {
-    if(currentEl) currentEl.classList.add('hidden');
-    targetEl.classList.remove('hidden');
-    setTimeout(() => { targetEl.style.opacity = '1'; }, 50);
-    currentPage = targetPage;
-    if (targetPage === 'assetStatusView') { switchStatusTab(1); loadP10DocumentsList(); }
-  }, 250);
-  if (window.innerWidth < 768) document.getElementById('sidebar').classList.add('-translate-x-full');
-}
+      if(currentEl) currentEl.style.opacity = '0';
+      setTimeout(() => {
+        if(currentEl) currentEl.classList.add('hidden');
+        targetEl.classList.remove('hidden');
+        setTimeout(() => { targetEl.style.opacity = '1'; }, 50);
+        currentPage = targetPage;
+        if (targetPage === 'assetStatusView') { switchStatusTab(1); loadP10DocumentsList(); }
+      }, 250);
+      if (window.innerWidth < 768) document.getElementById('sidebar').classList.add('-translate-x-full');
+    }
 
     function switchStatusTab(tabNum) {
       for (let i = 1; i <= 3; i++) {
@@ -1017,111 +1009,103 @@ function switchPage(targetPage) {
       });
     }
 
-    // อัปเดตฟังก์ชันค้นหาในหน้ารายการหลัก (รองรับกรองสถานะ)
-function applyFilters() {
-  const query = document.getElementById('searchTableInput').value.toLowerCase();
-  const selectedClass = document.getElementById('filterAssetClass').value;
-  const selectedOpStatus = document.getElementById('filterOpStatus').value;
+    function applyFilters() {
+      const query = document.getElementById('searchTableInput').value.toLowerCase();
+      const selectedClass = document.getElementById('filterAssetClass').value;
+      const selectedOpStatus = document.getElementById('filterOpStatus').value;
 
-  filteredAssets = assetDataCache.filter(item => {
-    const matchQuery = !query || 
-      (item.assetNo && String(item.assetNo).toLowerCase().includes(query)) ||
-      (item.description1 && item.description1.toLowerCase().includes(query)) ||
-      (item.costCenter && item.costCenter.toLowerCase().includes(query));
-    const matchClass = !selectedClass || item.assetClass === selectedClass;
-    const matchOpStatus = !selectedOpStatus || (item.current_status && item.current_status.includes(selectedOpStatus));
-    
-    // ตัดการซ่อนของตัดจำหน่ายออก เพื่อให้แอดมินค้นหาและดึงคืนได้
-    return matchQuery && matchClass && matchOpStatus;
-  });
-  document.getElementById('filteredTotalBadge').innerText = `${filteredAssets.length} รายการ`;
-  currentPageNum = 1;
-  renderPaginatedTable();
-}
-
-    // ==========================================
-// 4. แก้ไขปุ่มในตารางหลัก ให้มีปุ่ม "คืนสภาพ" กรณีกดตัดจำหน่ายผิด
-// นำฟังก์ชันนี้ไป ทับ ของเดิม
-// ==========================================
-function renderPaginatedTable() {
-  const tbody = document.getElementById('assetTableBody');
-  tbody.innerHTML = '';
-  const total = filteredAssets.length;
-  if (total === 0) {
-    tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-500">ไม่พบรายการ</td></tr>`;
-    updatePaginationUI(0, 0, 0, 0); return;
-  }
-  const totalPages = Math.ceil(total / pageSize);
-  if (currentPageNum > totalPages) currentPageNum = totalPages;
-  const startIndex = (currentPageNum - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, total);
-  
-  filteredAssets.slice(startIndex, endIndex).forEach((item, pageIndex) => {
-    const globalIndex = startIndex + pageIndex;
-    const originalIndex = assetDataCache.findIndex(x => x.assetNo === item.assetNo);
-    const isChecked = selectedAssetNos.has(item.assetNo);
-    
-    let badge = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-    if (item.current_status.includes('ซ่อม')) badge = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
-    else if (item.current_status.includes('ยืม')) badge = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
-    else if (item.current_status.includes('ตัด')) badge = 'bg-red-500/10 text-red-400 border-red-500/20'; // เพิ่มสีแดงสำหรับของตัดจำหน่าย
-
-    const lifeInfo = calculateRemainingLife(item.receivedDate, item.usefulLifeYear, item.usefulLifeMonth);
-    let lifeBadge = lifeInfo.status === 'expired' ? `<span class="text-red-500 font-bold">${lifeInfo.text}</span>` : 
-                    (lifeInfo.status === 'warning' ? `<span class="text-amber-500 font-bold">${lifeInfo.text}</span>` : `<span class="text-slate-400">${lifeInfo.text}</span>`);
-    
-    // ตรวจสอบสถานะ หากตัดจำหน่ายไปแล้ว ให้แสดงปุ่ม "คืนสภาพ" แทนปุ่ม "+ พ.10"
-    const isDisposed = item.current_status.includes('ตัดจำหน่าย') || item.current_status.includes('ตัดแล้ว');
-    let manageBtns = `
-      <button onclick="showAssetDetail(${originalIndex})" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-[10px]"><i class="ri-eye-line"></i></button>
-      <button onclick="openEditAssetModal('${item.assetNo}')" class="px-2 py-1 bg-amber-600/20 text-amber-400 rounded-lg text-[10px]">แก้ไข</button>
-      <button onclick="deleteSingleAsset('${item.assetNo}')" class="px-2 py-1 bg-red-600/20 text-red-400 rounded-lg text-[10px]"><i class="ri-delete-bin-line"></i></button>
-    `;
-    
-    if (isDisposed) {
-       manageBtns += `<button onclick="revertDisposal('${item.assetNo}')" class="px-2 py-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 rounded-lg text-[10px] font-semibold shadow-md"><i class="ri-arrow-go-back-line"></i> คืนสภาพ</button>`;
-    } else {
-       manageBtns += `<button onclick="addToCart('${item.assetNo}')" class="px-2 py-1 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 rounded-lg text-[10px] font-semibold">+ พ.10</button>`;
+      filteredAssets = assetDataCache.filter(item => {
+        const matchQuery = !query || 
+          (item.assetNo && String(item.assetNo).toLowerCase().includes(query)) ||
+          (item.description1 && item.description1.toLowerCase().includes(query)) ||
+          (item.costCenter && item.costCenter.toLowerCase().includes(query));
+        const matchClass = !selectedClass || item.assetClass === selectedClass;
+        const matchOpStatus = !selectedOpStatus || (item.current_status && item.current_status.includes(selectedOpStatus));
+        
+        return matchQuery && matchClass && matchOpStatus;
+      });
+      document.getElementById('filteredTotalBadge').innerText = `${filteredAssets.length} รายการ`;
+      currentPageNum = 1;
+      renderPaginatedTable();
     }
 
-    tbody.innerHTML += `
-      <tr class="hover:bg-slate-900/50 transition-colors ${isChecked ? 'bg-red-950/20' : ''}">
-        <td class="p-3.5 text-center"><input type="checkbox" value="${item.assetNo}" data-index="${globalIndex}" ${isChecked ? 'checked' : ''} onclick="handleCheckboxClick(event, this)" class="rounded bg-slate-900 border-slate-700 text-red-600"></td>
-        <td class="p-3.5 font-bold text-white">${item.assetNo || ''}</td>
-        <td class="p-3.5 text-slate-300 font-medium">${item.assetClass || '-'}</td>
-        <td class="p-3.5 text-slate-200">${item.description1 || ''}</td>
-        <td class="p-3.5 text-slate-400">${item.costCenter || ''}</td>
-        <td class="p-3.5"><span class="px-2.5 py-1 rounded-full text-[10px] font-semibold border ${badge}">${item.current_status || 'ปกติ'}</span></td>
-        <td class="p-3.5 text-center text-[10px]">${lifeBadge}</td>
-        <td class="p-3.5 text-slate-400">${item.current_holder || '-'}</td>
-        <td class="p-3.5 text-center">
-          <div class="flex items-center justify-center gap-1.5 flex-wrap">
-            ${manageBtns}
-          </div>
-        </td>
-      </tr>
-    `;
-  });
-  updatePaginationUI(startIndex + 1, endIndex, total, totalPages);
-  updateMultiSelectBar();
-}
-    // ==========================================
-// 5. ฟังก์ชันคืนสภาพกรณีตัดจำหน่ายผิดพลาด
-// ==========================================
-async function revertDisposal(assetNo) {
-    if(!confirm(`ต้องการยกเลิกการตัดจำหน่าย และดึงครุภัณฑ์ [${assetNo}] กลับมาเป็น "ใช้งานปกติ" ใช่หรือไม่?`)) return;
-    showSpinner(true, 'กำลังคืนสภาพครุภัณฑ์...');
-    try {
-        await callGAS("updateAssetOperationalStatus", {
-            assetNoList: [assetNo], status: "ใช้งานปกติ", holder: "-", remarks: "ดึงกลับจากการตัดจำหน่าย (ยกเลิก)",
-            imageBase64: null, fileName: '', userEmail: currentUser ? currentUser.email : "Staff"
-        });
-        showSpinner(false); playAudio('success'); alert('คืนสภาพครุภัณฑ์เรียบร้อยแล้ว');
-        loadAssetData();
-    } catch (err) { 
-        showSpinner(false); alert(err.message); 
+    function renderPaginatedTable() {
+      const tbody = document.getElementById('assetTableBody');
+      tbody.innerHTML = '';
+      const total = filteredAssets.length;
+      if (total === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-500">ไม่พบรายการ</td></tr>`;
+        updatePaginationUI(0, 0, 0, 0); return;
+      }
+      const totalPages = Math.ceil(total / pageSize);
+      if (currentPageNum > totalPages) currentPageNum = totalPages;
+      const startIndex = (currentPageNum - 1) * pageSize;
+      const endIndex = Math.min(startIndex + pageSize, total);
+      
+      filteredAssets.slice(startIndex, endIndex).forEach((item, pageIndex) => {
+        const globalIndex = startIndex + pageIndex;
+        const originalIndex = assetDataCache.findIndex(x => x.assetNo === item.assetNo);
+        const isChecked = selectedAssetNos.has(item.assetNo);
+        
+        let badge = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+        if (item.current_status.includes('ซ่อม')) badge = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+        else if (item.current_status.includes('ยืม')) badge = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+        else if (item.current_status.includes('ตัด')) badge = 'bg-red-500/10 text-red-400 border-red-500/20';
+
+        const lifeInfo = calculateRemainingLife(item.receivedDate, item.usefulLifeYear, item.usefulLifeMonth);
+        let lifeBadge = lifeInfo.status === 'expired' ? `<span class="text-red-500 font-bold">${lifeInfo.text}</span>` : 
+                        (lifeInfo.status === 'warning' ? `<span class="text-amber-500 font-bold">${lifeInfo.text}</span>` : `<span class="text-slate-400">${lifeInfo.text}</span>`);
+        
+        const isDisposed = item.current_status.includes('ตัดจำหน่าย') || item.current_status.includes('ตัดแล้ว');
+        let manageBtns = `
+          <button onclick="showAssetDetail(${originalIndex})" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-[10px]"><i class="ri-eye-line"></i></button>
+          <button onclick="openEditAssetModal('${item.assetNo}')" class="px-2 py-1 bg-amber-600/20 text-amber-400 rounded-lg text-[10px]">แก้ไข</button>
+          <button onclick="deleteSingleAsset('${item.assetNo}')" class="px-2 py-1 bg-red-600/20 text-red-400 rounded-lg text-[10px]"><i class="ri-delete-bin-line"></i></button>
+        `;
+        
+        if (isDisposed) {
+           manageBtns += `<button onclick="revertDisposal('${item.assetNo}')" class="px-2 py-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 rounded-lg text-[10px] font-semibold shadow-md"><i class="ri-arrow-go-back-line"></i> คืนสภาพ</button>`;
+        } else {
+           manageBtns += `<button onclick="addToCart('${item.assetNo}')" class="px-2 py-1 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 rounded-lg text-[10px] font-semibold">+ พ.10</button>`;
+        }
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-900/50 transition-colors ${isChecked ? 'bg-red-950/20' : ''}">
+            <td class="p-3.5 text-center"><input type="checkbox" value="${item.assetNo}" data-index="${globalIndex}" ${isChecked ? 'checked' : ''} onclick="handleCheckboxClick(event, this)" class="rounded bg-slate-900 border-slate-700 text-red-600"></td>
+            <td class="p-3.5 font-bold text-white">${item.assetNo || ''}</td>
+            <td class="p-3.5 text-slate-300 font-medium">${item.assetClass || '-'}</td>
+            <td class="p-3.5 text-slate-200">${item.description1 || ''}</td>
+            <td class="p-3.5 text-slate-400">${item.costCenter || ''}</td>
+            <td class="p-3.5"><span class="px-2.5 py-1 rounded-full text-[10px] font-semibold border ${badge}">${item.current_status || 'ปกติ'}</span></td>
+            <td class="p-3.5 text-center text-[10px]">${lifeBadge}</td>
+            <td class="p-3.5 text-slate-400">${item.current_holder || '-'}</td>
+            <td class="p-3.5 text-center">
+              <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                ${manageBtns}
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      updatePaginationUI(startIndex + 1, endIndex, total, totalPages);
+      updateMultiSelectBar();
     }
-}
+
+    async function revertDisposal(assetNo) {
+        if(!confirm(`ต้องการยกเลิกการตัดจำหน่าย และดึงครุภัณฑ์ [${assetNo}] กลับมาเป็น "ใช้งานปกติ" ใช่หรือไม่?`)) return;
+        showSpinner(true, 'กำลังคืนสภาพครุภัณฑ์...');
+        try {
+            await callGAS("updateAssetOperationalStatus", {
+                assetNoList: [assetNo], status: "ใช้งานปกติ", holder: "-", remarks: "ดึงกลับจากการตัดจำหน่าย (ยกเลิก)",
+                imageBase64: null, fileName: '', userEmail: currentUser ? currentUser.email : "Staff"
+            });
+            showSpinner(false); playAudio('success'); alert('คืนสภาพครุภัณฑ์เรียบร้อยแล้ว');
+            loadAssetData();
+        } catch (err) { 
+            showSpinner(false); alert(err.message); 
+        }
+    }
+
     function handleCheckboxClick(e, chk) {
       const currentIndex = parseInt(chk.getAttribute('data-index'));
       const assetNo = chk.value;
@@ -1249,45 +1233,48 @@ async function revertDisposal(assetNo) {
       } catch (err) { showSpinner(false); alert(err.message); }
     }
 
-    // ==========================================
-// ฟังก์ชันอัปเดตสถานะแบบ Bulk (รองรับจำนวนเยอะๆ พร้อม Progress Bar)
-// ==========================================
-async function submitStatusUpdateForm() {
-  const arr = Array.from(statusSelectedAssetNos);
-  if (arr.length === 0) return alert('กรุณาเลือกรายการที่ต้องการอัปเดต');
-  const newStatus = document.getElementById('status_newStatus').value;
+    async function submitStatusUpdateForm() {
+      const arr = Array.from(statusSelectedAssetNos);
+      if (arr.length === 0) return alert('กรุณาเลือกรายการที่ต้องการอัปเดต');
+      const newStatus = document.getElementById('status_newStatus').value;
 
-  // 🛑 เพิ่มระบบตรวจสอบ: ห้ามตัดจำหน่ายหากยัง "ถูกยืม" 🛑
-  if (newStatus.includes('ตัดจำหน่าย')) {
-    for (let assetNo of arr) {
-      const item = assetDataCache.find(x => x.assetNo === assetNo);
-      // หากพบคำว่า "ยืม" ในสถานะปัจจุบัน ให้บล็อกการทำงานทันที
-      if (item && item.current_status && item.current_status.includes('ยืม')) {
-        return alert(`❌ ไม่สามารถตัดจำหน่ายได้\n\nครุภัณฑ์เลขที่: ${assetNo}\nยังอยู่ในสถานะ "ถูกยืมใช้งาน"\nกรุณาทำรายการรับคืนให้เรียบร้อยก่อนทำการตัดจำหน่าย`);
+      if (newStatus.includes('ตัดจำหน่าย')) {
+        for (let assetNo of arr) {
+          const item = assetDataCache.find(x => x.assetNo === assetNo);
+          if (item && item.current_status && item.current_status.includes('ยืม')) {
+            return alert(`❌ ไม่สามารถตัดจำหน่ายได้\n\nครุภัณฑ์เลขที่: ${assetNo}\nยังอยู่ในสถานะ "ถูกยืมใช้งาน"\nกรุณาทำรายการรับคืนให้เรียบร้อยก่อนทำการตัดจำหน่าย`);
+          }
+        }
       }
+
+      const fileInput = document.getElementById('status_attachmentFile');
+      showSpinner(true, `กำลังดำเนินการ ${arr.length} รายการ...`, { current: 0, total: arr.length });
+
+      const proceedSubmit = async (imageBase64 = null) => {
+        try {
+          const chunkSize = 50;
+          let successCount = 0;
+          for (let i = 0; i < arr.length; i += chunkSize) {
+            const chunk = arr.slice(i, i + chunkSize);
+            const res = await callGAS("updateAssetOperationalStatus", {
+              assetNoList: chunk, status: newStatus, holder: "-", remarks: "-", 
+              imageBase64: imageBase64, fileName: 'location_img', userEmail: currentUser ? currentUser.email : "Staff"
+            });
+            successCount += (res.count || chunk.length);
+            showSpinner(true, `กำลังดำเนินการ ${arr.length} รายการ...`, { current: successCount, total: arr.length });
+          }
+          showSpinner(false); playAudio('success'); alert(`สำเร็จ ${successCount} รายการ`);
+          statusSelectedAssetNos.clear(); if(fileInput) fileInput.value = ''; loadAssetData();
+        } catch (err) { showSpinner(false); alert(err.message); }
+      };
+
+      if (fileInput && fileInput.files.length > 0) {
+        const reader = new FileReader();
+        reader.onload = function(evt) { proceedSubmit(evt.target.result); };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else { proceedSubmit(null); }
     }
-  }
 
-  const fileInput = document.getElementById('status_attachmentFile');
-  showSpinner(true, `กำลังดำเนินการ ${arr.length} รายการ...`);
-
-  const proceedSubmit = async (imageBase64 = null) => {
-    try {
-      const res = await callGAS("updateAssetOperationalStatus", {
-        assetNoList: arr, status: newStatus, holder: "-", remarks: "-", 
-        imageBase64: imageBase64, fileName: 'location_img', userEmail: currentUser ? currentUser.email : "Staff"
-      });
-      showSpinner(false); playAudio('success'); alert(`สำเร็จ ${res.count} รายการ`);
-      statusSelectedAssetNos.clear(); if(fileInput) fileInput.value = ''; loadAssetData();
-    } catch (err) { showSpinner(false); alert(err.message); }
-  };
-
-  if (fileInput && fileInput.files.length > 0) {
-    const reader = new FileReader();
-    reader.onload = function(evt) { proceedSubmit(evt.target.result); };
-    reader.readAsDataURL(fileInput.files[0]);
-  } else { proceedSubmit(null); }
-}
     async function markAsPendingDisposal(assetNoList) {
        if(!confirm('ยืนยันตั้งเป็น "รอตัดจำหน่าย" จำนวน ' + assetNoList.length + ' รายการ?')) return;
        showSpinner(true, 'กำลังอัปเดต...');
@@ -1323,30 +1310,177 @@ async function submitStatusUpdateForm() {
       } catch(e) { content.innerHTML = '<p class="text-red-400">โหลดล้มเหลว</p>'; }
     }
 
-    async function updateCurrentP10Status() {
-      if (!activeP10Doc) return;
-      const status = document.getElementById('p10ModalNewStatus').value;
-      const remarks = document.getElementById('p10ModalStatusRemarks').value;
-      showSpinner(true, 'กำลังบันทึก...');
-      try {
-        await callGAS("updateP10DocStatus", { docNo: activeP10Doc.docNo, docStatus: status, statusRemarks: remarks });
-        showSpinner(false); playAudio('success'); alert('อัปเดตเรียบร้อย');
-        activeP10Doc.docStatus = status; openP10DetailModal(activeP10Doc.docNo); loadP10DocumentsList();
-      } catch (err) { showSpinner(false); alert(err.message); }
+    function closeStatusHistoryModal() {
+      document.getElementById('statusHistoryModal').classList.add('hidden');
     }
 
-    async function promptAddItemToP10() {
+    async function printCurrentP10Pdf() {
       if (!activeP10Doc) return;
-      const newAssetNo = prompt("ระบุเลขที่สินทรัพย์ (Asset No.):");
-      if (newAssetNo) {
-        activeP10Doc.items = activeP10Doc.items || [];
-        activeP10Doc.items.push(newAssetNo);
-        showSpinner(true, 'กำลังอัปเดต...');
-        try {
-          await callGAS("updateP10DocumentItems", { p10Running: activeP10Doc.docNo, updatedItems: activeP10Doc.items });
-          showSpinner(false); openP10DetailModal(activeP10Doc.docNo); loadP10DocumentsList();
-        } catch (err) { showSpinner(false); alert(err.message); }
+      const docNo = activeP10Doc.docNo || activeP10Doc.p10running;
+      
+      showSpinner(true, 'กำลังดึงข้อมูลลง Template และสร้างไฟล์ PDF...');
+      
+      try {
+        const res = await callGAS("exportP10PdfFromTemplate", docNo);
+        showSpinner(false);
+        playAudio('success');
+        
+        if (res.url) {
+            window.open(res.url, '_blank');
+        } else {
+            alert('สร้าง PDF สำเร็จ แต่ดึงลิงก์ไม่ทัน กรุณาตรวจสอบใน Google Drive');
+        }
+      } catch (err) {
+        showSpinner(false);
+        alert('เกิดข้อผิดพลาดในการสร้าง PDF: ' + err.message);
       }
+    }
+
+    function openP10DetailModal(docNo) {
+        const doc = p10DocsCache.find(x => x.docNo === docNo || x.p10running === docNo);
+        if (!doc) return;
+        activeP10Doc = doc;
+
+        document.getElementById('p10ModalTitle').innerHTML = `<i class="ri-file-text-line text-red-500"></i> จัดการใบ พ.10: <span class="text-emerald-400">${doc.docNo || doc.p10running}</span>`;
+        const content = document.getElementById('p10ModalContent');
+
+        let itemsHtml = '';
+        let totalItems = (doc.items || []).length;
+        let returnedCount = 0;
+
+        (doc.items || []).forEach((itemId, idx) => {
+            const assetNo = typeof itemId === 'object' ? itemId.assetNo : itemId;
+            const assetObj = assetDataCache.find(x => x.assetNo === assetNo) || { current_status: 'ไม่ทราบ', description1: '-' };
+            
+            const isReturned = assetObj.current_status === 'ใช้งานปกติ';
+            if (isReturned) returnedCount++;
+
+            itemsHtml += `
+            <li class="flex justify-between items-center p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs">
+                <div class="flex items-center gap-2 overflow-hidden">
+                    <input type="checkbox" id="return_chk_${idx}" value="${assetNo}" class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-emerald-500 shrink-0" ${isReturned ? 'checked disabled' : ''}>
+                    <span class="truncate text-slate-300"><strong>${assetNo}</strong> - ${assetObj.description1}</span>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <span class="px-2 py-1 rounded-md text-[10px] font-bold ${isReturned ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">${isReturned ? 'รับคืนแล้ว' : 'ยังไม่คืน'}</span>
+                    <button onclick="removeP10Item(${idx})" class="text-slate-400 hover:text-red-400 ${isReturned ? 'hidden' : ''}"><i class="ri-delete-bin-line"></i></button>
+                </div>
+            </li>`;
+        });
+
+        let docStatusBadge = doc.docStatus === 'ส่งคืนสำเร็จ' ? 'text-emerald-400' : 'text-amber-400';
+
+        content.innerHTML = `
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800"><p class="text-slate-400 mb-1">ถึงหน่วยงาน:</p><p class="font-bold text-white">${doc.toAgency || '-'}</p></div>
+            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800"><p class="text-slate-400 mb-1">ประเภท:</p><p class="font-bold text-white">${doc.type}</p></div>
+            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 md:col-span-2"><p class="text-slate-400 mb-1">สถานะเอกสาร:</p><p class="font-bold ${docStatusBadge}">${doc.docStatus || 'ยืมใช้งานอยู่'} (${returnedCount}/${totalItems})</p></div>
+        </div>
+
+        <div class="glass-card p-4 rounded-xl border border-slate-700 space-y-3">
+            <div class="flex flex-wrap justify-between items-center gap-2">
+                <h5 class="font-bold text-xs text-white"><i class="ri-checkbox-circle-line text-emerald-400 me-1"></i> รายการครุภัณฑ์ (ติ๊กเลือกเพื่อรับคืน)</h5>
+                <button onclick="processReturnP10Items()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-semibold flex items-center gap-1 shadow-lg shadow-emerald-500/20"><i class="ri-save-line"></i> ยืนยันรับคืน/เปลี่ยนสถานะ</button>
+            </div>
+            <ul class="space-y-2 max-h-40 overflow-y-auto hide-scrollbar">
+                ${itemsHtml || '<li class="text-slate-500 text-center py-2">ไม่มีรายการครุภัณฑ์</li>'}
+            </ul>
+            <div class="pt-2">
+                <label class="block text-[10px] text-slate-400 mb-1">หมายเหตุรับคืน / กรณีคืนไม่ครบ</label>
+                <input type="text" id="p10ModalStatusRemarks" class="w-full px-3 py-2 rounded-lg glass-input text-xs" placeholder="ระบุเหตุผลการคืนไม่ครบ..." value="${doc.statusRemarks || ''}">
+            </div>
+        </div>
+
+        <div class="glass-card p-4 rounded-xl border border-slate-700 space-y-3">
+            <h5 class="font-bold text-xs text-white flex justify-between items-center">
+                <span><i class="ri-image-line text-red-500 me-1"></i> ภาพถ่ายเอกสาร / สภาพครุภัณฑ์ (เพิ่ม/ลบได้ตลอด)</span>
+            </h5>
+            <div class="flex flex-wrap items-center gap-2">
+                <input type="file" id="signedP10ImageInput" accept="image/*" class="text-xs text-slate-300 glass-input rounded-lg px-2 py-1.5 flex-1 min-w-[200px]">
+                <button onclick="uploadSignedImageToP10()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1"><i class="ri-upload-cloud-line"></i> อัปโหลด</button>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
+                ${(doc.signedImages || []).map(img => `
+                <div class="relative group bg-slate-900 border border-slate-800 p-1.5 rounded-xl text-center">
+                    <img src="${img.url}" class="w-full h-24 object-cover rounded-lg">
+                    <a href="${img.url}" target="_blank" class="text-[10px] text-blue-400 hover:text-blue-300 underline block mt-1 truncate">เปิดดูใน Drive</a>
+                    <button onclick="deleteSignedP10Image('${img.fileId}')" class="absolute top-2 right-2 p-1 bg-red-600 hover:bg-red-500 text-white rounded-full text-[10px] shadow-lg"><i class="ri-delete-bin-line"></i></button>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+        `;
+        document.getElementById('p10DetailModal').classList.remove('hidden');
+    }
+
+    function closeP10DetailModal() { document.getElementById('p10DetailModal').classList.add('hidden'); }
+
+    async function processReturnP10Items() {
+        if (!activeP10Doc) return;
+        const doc = activeP10Doc;
+        let selectedToReturn = [];
+        let totalItems = (doc.items || []).length;
+        let alreadyReturnedCount = 0;
+
+        (doc.items || []).forEach((itemId, idx) => {
+            const chk = document.getElementById('return_chk_' + idx);
+            const assetNo = typeof itemId === 'object' ? itemId.assetNo : itemId;
+            if (chk) {
+                if (chk.checked && !chk.disabled) selectedToReturn.push(assetNo);
+                if (chk.disabled) alreadyReturnedCount++;
+            }
+        });
+
+        const remarks = document.getElementById('p10ModalStatusRemarks').value;
+
+        if (selectedToReturn.length === 0 && remarks === (doc.statusRemarks || '')) {
+            return alert('กรุณาติ๊กเลือกรายการที่ได้รับคืน หรือ อัปเดตหมายเหตุก่อนกดยืนยัน');
+        }
+
+        if (selectedToReturn.length > 0 && !confirm(`ยืนยันการรับคืนครุภัณฑ์จำนวน ${selectedToReturn.length} รายการ เข้าระบบคลัง?`)) return;
+
+        showSpinner(true, 'กำลังบันทึกข้อมูลการรับคืน...', { current: 0, total: selectedToReturn.length });
+
+        try {
+            if (selectedToReturn.length > 0) {
+                const chunkSize = 50;
+                let successCount = 0;
+                for (let i = 0; i < selectedToReturn.length; i += chunkSize) {
+                    const chunk = selectedToReturn.slice(i, i + chunkSize);
+                    await callGAS("updateAssetOperationalStatus", {
+                        assetNoList: chunk, status: "ใช้งานปกติ", holder: "-", remarks: `รับคืนจากใบ พ.10: ${doc.docNo || doc.p10running}`, 
+                        imageBase64: null, fileName: '', userEmail: currentUser ? currentUser.email : "Staff"
+                    });
+                    successCount += chunk.length;
+                    showSpinner(true, 'กำลังบันทึกข้อมูลการรับคืน...', { current: successCount, total: selectedToReturn.length });
+                }
+            }
+
+            showSpinner(true, 'กำลังอัปเดตสถานะใบงาน พ.10...');
+
+            let newReturnedCount = alreadyReturnedCount + selectedToReturn.length;
+            let newDocStatus = doc.docStatus;
+
+            if (newReturnedCount === totalItems && totalItems > 0) newDocStatus = "ส่งคืนสำเร็จ"; 
+            else if (newReturnedCount > 0 && newReturnedCount < totalItems) newDocStatus = "ส่งคืนแล้วแต่ไม่ครบ"; 
+
+            await callGAS("updateP10DocStatus", { 
+                docNo: doc.docNo || doc.p10running, docStatus: newDocStatus, statusRemarks: remarks 
+            });
+
+            await loadAssetData(); 
+            await loadP10DocumentsList(); 
+            
+            showSpinner(false); 
+            playAudio('success'); 
+            alert('อัปเดตการรับคืนสำเร็จ!');
+            
+            const updatedDoc = p10DocsCache.find(x => x.docNo === (doc.docNo || doc.p10running));
+            if (updatedDoc) openP10DetailModal(updatedDoc.docNo || updatedDoc.p10running); 
+
+        } catch (err) {
+            showSpinner(false); alert('เกิดข้อผิดพลาด: ' + err.message);
+        }
     }
 
     async function removeP10Item(idx) {
@@ -1447,7 +1581,6 @@ async function submitStatusUpdateForm() {
         setTimeout(() => {
             html5QrCodeLive = new Html5Qrcode("liveScanReader");
             
-            // ตั้งค่าแบบเซฟที่สุด (Safe Mode) ไม่ตีกรอบ ไม่บังคับสัดส่วน เพื่อให้กล้องทำงานได้บนทุกรุ่น
             const config = { 
                 fps: 10,
                 disableFlip: false
@@ -1495,319 +1628,9 @@ async function submitStatusUpdateForm() {
             playAudio('error'); document.getElementById('qrScanStatusOverlay').innerText = "ไม่พบ QR Code";
         }).finally(() => { event.target.value = ""; });
     }
-
-    function addQuickInputToCart() {
-      const input = document.getElementById('quickAssetInput');
-      const val = input.value.trim();
-      if (!val) return;
-      addToCart(val); input.value = '';
-    }
-    function addToCart(assetNo) {
-      if (!cart.includes(assetNo)) { cart.push(assetNo); playAudio('success'); renderCart(); }
-    }
-    // ==========================================
-// 1. ฟังก์ชันตะกร้า (โชว์ทั้งเลขและชื่อครุภัณฑ์)
-// ==========================================
-function renderCart() {
-  document.getElementById('cartCountBadge').innerText = cart.length + ' รายการ';
-  document.getElementById('p10Cart').innerHTML = cart.map((item, idx) => {
-    const assetObj = assetDataCache.find(x => x.assetNo === item) || {};
-    const desc = assetObj.description1 ? ` <span class="text-slate-400 ml-1 truncate max-w-[150px]">- ${assetObj.description1}</span>` : '';
-    return `
-    <li class="flex justify-between items-center p-2.5 rounded-xl glass-card text-xs border border-slate-800">
-      <span class="flex items-center truncate pr-2"><i class="ri-box-3-line text-red-500 me-1"></i><strong>${item}</strong>${desc}</span>
-      <button onclick="cart.splice(${idx},1);renderCart();" class="text-red-400 hover:text-red-300 shrink-0"><i class="ri-delete-bin-line text-sm"></i></button>
-    </li>`;
-  }).join('');
-}
-
-    function parseCustomDate(str) {
-      if(!str) return null; let d = new Date(str);
-      if(!isNaN(d.getTime())) return d;
-      let parts = str.split('/'); if(parts.length===3) { let y=parseInt(parts[2]); if(y>2400)y-=543; return new Date(y, parts[1]-1, parts[0]); } return null;
-    }
-    function calculateRemainingLife(receivedDate, lifeYears, lifeMonths) {
-      const start = parseCustomDate(receivedDate); if(!start) return { text: '-', status: 'none' };
-      const y = parseInt(lifeYears)||0, m = parseInt(lifeMonths)||0; if(!y && !m) return { text: '-', status: 'none' };
-      const exp = new Date(start); exp.setFullYear(exp.getFullYear()+y); exp.setMonth(exp.getMonth()+m);
-      const diffDays = Math.ceil((exp - new Date()) / (1000*60*60*24));
-      if (diffDays < 0) return { text: 'หมดอายุแล้ว', status: 'expired' };
-      if (diffDays <= 180) return { text: `ใกล้หมดอายุ`, status: 'warning' }; return { text: `ปกติ`, status: 'good' };
-    }
-    function checkExpirations(data) {
-       expiredAssetsList = data.filter(item => {
-           if(item.current_status && item.current_status.includes('ตัด')) return false;
-           return calculateRemainingLife(item.receivedDate, item.usefulLifeYear, item.usefulLifeMonth).status === 'expired';
-       });
-       filteredExpiryAssets = [...expiredAssetsList];
-       const badge = document.getElementById('expiryBadgeCount');
-       if(expiredAssetsList.length > 0) { badge.innerText = expiredAssetsList.length; badge.classList.remove('hidden'); } else badge.classList.add('hidden');
-    }
-    function openExpiryNotifyModal() { filteredExpiryAssets = [...expiredAssetsList]; renderExpiryTable(); document.getElementById('expiryNotifyModal').classList.remove('hidden'); }
-    function closeExpiryModal() { document.getElementById('expiryNotifyModal').classList.add('hidden'); }
-    function renderExpiryTable() {
-       const tbody = document.getElementById('expiryListBody'); tbody.innerHTML = ''; document.getElementById('expiryTotalText').innerText = filteredExpiryAssets.length;
-       filteredExpiryAssets.slice(0, 15).forEach((item) => {
-          tbody.innerHTML += `<tr class="hover:bg-slate-900/50"><td class="p-3 text-center"><input type="checkbox" value="${item.assetNo}" class="rounded bg-slate-900 text-red-600"></td>
-          <td class="p-3 font-bold text-white">${item.assetNo}</td><td class="p-3">${item.description1||'-'}</td><td class="p-3">${item.receivedDate||'-'}</td>
-          <td class="p-3"><button onclick="markAsPendingDisposal(['${item.assetNo}'])" class="px-3 py-1 bg-red-600/20 text-red-400 rounded">รอตัดจำหน่าย</button></td></tr>`;
-       });
-    }
-
-    function normalizeExcelRow(row) {
-      const keys = Object.keys(row);
-      const cleanKeys = keys.map(k => k ? String(k).replace(/[\r\n\t]/g, '').replace(/\s+/g, ' ').trim().toLowerCase() : '');
-      function getValByKeys(aliases) {
-        for (let alias of aliases) {
-          const cleanAlias = String(alias).toLowerCase();
-          for (let i = 0; i < cleanKeys.length; i++) {
-            if (cleanKeys[i] === cleanAlias || cleanKeys[i].includes(cleanAlias)) {
-              const val = row[keys[i]];
-              if (val !== undefined && val !== null && String(val).trim() !== '') return String(val).trim();
-            }
-          }
-        } return '';
-      }
-      let assetNo = '';
-      for (let i = 0; i < keys.length; i++) {
-        if (cleanKeys[i].includes('เลขที่สินทรัพย์') && !cleanKeys[i].includes('ขอสร้าง') && !cleanKeys[i].includes('ย่อย') && !cleanKeys[i].includes('เก่า')) {
-          assetNo = String(row[keys[i]]).trim(); break;
-        }
-      }
-      if (!assetNo && keys.length >= 3) assetNo = String(row[keys[2]]).trim();
-      if (!assetNo || assetNo === 'undefined') return null;
-
-      return {
-        assetNo: assetNo, preAssetNo: getValByKeys(['เลขที่ใบขอสร้างสินทรัพย์', 'pre-asset no']), assetSubNo: getValByKeys(['เลขที่สินทรัพย์ย่อย', 'asset sub no']) || '0000',
-        inventoryNumber: getValByKeys(['เลขที่สินทรัพย์เก่า', 'inventory number']), assetSuperNo: getValByKeys(['กลุ่มสินทรัพย์', 'asset super no']),
-        assetClass: getValByKeys(['ประเภทสินทรัพย์', 'asset class']), subClass: getValByKeys(['กลุ่มสินทรัพย์ย่อย', 'sub class']),
-        description1: getValByKeys(['คำอธิบายสินทรัพย์ 1', 'description 1']), description2: getValByKeys(['คำอธิบายสินทรัพย์ 2', 'description 2']),
-        serialNumber: getValByKeys(['เลขที่ผลิตภัณฑ์', 'serial number']), quantity: getValByKeys(['ปริมาณ', 'quantity']) || '1', unit: getValByKeys(['หน่วยนับ', 'unit']) || 'EA',
-        assetValue: getValByKeys(['มูลค่าสินทรัพย์', 'asset value']), bookValue: getValByKeys(['มูลค่าคงเหลือตามบัญชี', 'book value']), costCenter: getValByKeys(['ศูนย์ต้นทุน', 'cost center']),
-        respCostCenter: getValByKeys(['ศูนย์ต้นทุนผู้รับผิดชอบ', 'resp. cost center']), borrowingAgency: getValByKeys(['หน่วยงานที่ยืม', 'borrowing agency']),
-        oldBudgetCode: getValByKeys(['รหัสงบประมาณเดิม', 'old budget code']), functionalArea: getValByKeys(['รหัสงบประมาณ', 'functional area']), fundCenter: getValByKeys(['หน่วยงานเจ้าของงบ', 'fund center']),
-        licensePlateNo: getValByKeys(['ทะเบียนรถ', 'license plane no']), source: getValByKeys(['แหล่งที่มา', 'source']), vendor: getValByKeys(['ชื่อผู้ขาย', 'vendor']), manufacturer: getValByKeys(['เลขที่สัญญา', 'manufacturer']),
-        usefulLifeYear: getValByKeys(['อายุการใช้งาน (ปี)', 'อายุการใช้งาน', 'useful life year']), usefulLifeMonth: getValByKeys(['อายุการใช้งาน (เดือน)', 'useful life month']),
-        poNo: getValByKeys(['เลขที่ใบสั่งซื้อ', 'po no']), purchasingAgency: getValByKeys(['หน่วยงานผู้จัดซื้อ', 'purchasing agency']), createdAssetDate: getValByKeys(['วันที่สร้างเลขที่สินทรัพย์', 'created asset date']),
-        receivedDate: getValByKeys(['วันที่รับไว้ใช้งาน', 'received date']), transferredDate: getValByKeys(['วันที่รับโอนสินทรัพย์', 'transferred date']), disposedDate: getValByKeys(['วันที่ตัดจำหน่ายสินทรัพย์', 'disposed date']),
-        replacementStatus: getValByKeys(['สถานะการขอทดแทน', 'replacement status']), replacementNote1: getValByKeys(['หมายเหตุขอทดแทน 1', 'replacement note 1']), replacementNote2: getValByKeys(['หมายเหตุขอทดแทน 2', 'replacement note 2']),
-        receiptStatus: getValByKeys(['สถานะการรับสินทรัพย์', 'receipt status']), confirmedDate: getValByKeys(['วันที่ยืนยันรับสินทรัพย์', 'confirmed date']), inReqProcess: getValByKeys(['อยู่ในกระบวนการเลขที่ใบคำขอ', 'in req process'])
-      };
-    }
-
-    function renderCharts(data) {
-      if(window.catChart) window.catChart.destroy(); if(window.ccChart) window.ccChart.destroy();
-      const total = data.length;
-      const borrowed = data.filter(i => i.current_status && (i.current_status.includes('ยืม') || i.current_status.includes('โอน'))).length;
-      const repairable = data.filter(i => i.current_status && i.current_status.includes('ซ่อม')).length;
-      const disposed = data.filter(i => i.current_status && (i.current_status.includes('ตัดจำหน่าย') || i.current_status.includes('ตัดแล้ว'))).length;
-      const normal = total - (borrowed + repairable + disposed);
-      window.catChart = new Chart(document.getElementById('categoryChart'), { type:'pie', data:{ labels:['ใช้งานปกติ','ถูกยืม/โอนย้าย','ชำรุดซ่อมได้','รอตัดจำหน่าย/ตัดแล้ว'], datasets:[{ data:[normal,borrowed,repairable,disposed], backgroundColor:['#10b981','#3b82f6','#f59e0b','#ef4444'] }] }, options: { plugins: { legend: { labels: { color: '#94a3b8' } } } } });
-      const classMap = {}; data.forEach(i => { const cls = i.assetClass || 'ไม่ระบุ'; classMap[cls] = (classMap[cls] || 0) + 1; });
-      window.ccChart = new Chart(document.getElementById('costCenterChart'), { type:'bar', data:{ labels:Object.keys(classMap).slice(0, 6), datasets:[{ label:'จำนวน (ชิ้น)', data:Object.values(classMap).slice(0, 6), backgroundColor:'#ef4444' }] }, options: { scales: { x: { ticks: { color: '#94a3b8' } }, y: { ticks: { color: '#94a3b8' } } }, plugins: { legend: { labels: { color: '#94a3b8' } } } } });
-    }
-
-    function openAddAssetWizard() { isEditMode = false; document.getElementById('w_assetNo').readOnly = false; document.getElementById('wizardAssetForm').reset(); currentWizardStep = 1; updateWizardStepUI(); document.getElementById('addAssetWizardModal').classList.remove('hidden'); }
-    function closeAddAssetWizard() { document.getElementById('addAssetWizardModal').classList.add('hidden'); }
-    function openBatchQrStatusModal() { document.getElementById('batchQrModal').classList.remove('hidden'); qrCurrentPage = 1; qrPrintList = Array.from(selectedAssetNos).length > 0 ? Array.from(selectedAssetNos) : filteredAssets.slice(0, 28).map(i => i.assetNo); if(qrPrintList.length === 0) return alert('กรุณาเลือกรายการที่ต้องการพิมพ์ QR Code'); renderQrModalPage(); }
-    function closeBatchQrModal() { 
-  document.getElementById('batchQrModal').classList.add('hidden'); 
-}
-    function showAssetDetail(index) {
-      const item = assetDataCache[index]; if (!item) return;
-      let lifeInfo = calculateRemainingLife(item.receivedDate, item.usefulLifeYear, item.usefulLifeMonth);
-      document.getElementById('assetDetailContent').innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800"><p class="text-slate-400 mb-1">เลขที่สินทรัพย์ (Asset No):</p><p class="font-bold text-lg text-white">${item.assetNo || '-'}</p></div>
-          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800"><p class="text-slate-400 mb-1">คำอธิบายสินทรัพย์:</p><p class="font-bold text-sm text-white">${item.description1 || '-'}</p></div>
-          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800"><p class="text-slate-400 mb-1">สถานะปัจจุบัน:</p><p class="font-bold text-emerald-400">${item.current_status || 'ใช้งานปกติ'}</p></div>
-          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800"><p class="text-slate-400 mb-1">ผู้ถือครอง:</p><p class="font-bold text-white">${item.current_holder || '-'}</p></div>
-          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800"><p class="text-slate-400 mb-1">วันที่รับไว้ใช้งาน:</p><p class="font-bold text-white">${item.receivedDate || '-'}</p></div>
-          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800"><p class="text-slate-400 mb-1">อายุการใช้งาน (กำหนดไว้):</p><p class="font-bold text-white">${item.usefulLifeYear || 0} ปี ${item.usefulLifeMonth || 0} เดือน <span class="text-amber-400 ml-2">(${lifeInfo.text})</span></p></div>
-          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800"><p class="text-slate-400 mb-1">ผู้ขาย (Vendor):</p><p class="font-bold text-white">${item.vendor || '-'}</p></div>
-          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800"><p class="text-slate-400 mb-1">ศูนย์ต้นทุน / งบประมาณ:</p><p class="font-bold text-white">${item.costCenter || '-'} ${item.fundCenter ? '('+item.fundCenter+')' : ''}</p></div>
-        </div>
-        ${item.remarks ? `<div class="mt-3 bg-slate-900/80 p-3 rounded-xl border border-slate-800"><p class="text-slate-400 mb-1">หมายเหตุ:</p><p class="text-white">${item.remarks}</p></div>` : ''}
-      `;
-      document.getElementById('assetDetailModal').classList.remove('hidden');
-    }
-    function closeAssetDetail() { document.getElementById('assetDetailModal').classList.add('hidden'); }
-    function startAuditSession() { playAudio('success'); document.getElementById('auditResultsArea').classList.remove('hidden'); document.getElementById('auditLogList').innerHTML = `<div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"><i class="ri-checkbox-circle-line me-1"></i> เริ่มต้นรอบการตรวจนับสต็อกสำเร็จ! พร้อมสแกน QR Code ตรวจนับ</div>`; }
-    function filterP10DocsTable() {
-      const statusFilter = document.getElementById('filterP10DocStatus').value;
-      const tbody = document.getElementById('p10DocsTableBody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-      
-      const filtered = p10DocsCache.filter(d => !statusFilter || d.docStatus === statusFilter);
-      if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">ไม่พบรายการเอกสาร พ.10</td></tr>`;
-        return;
-      }
-
-      filtered.forEach(doc => {
-        let statusBadge = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
-        if (doc.docStatus === 'ส่งคืนสำเร็จ') statusBadge = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-        else if (doc.docStatus === 'ส่งคืนแล้วแต่ไม่ครบ') statusBadge = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
-
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-900/50">
-            <td class="p-3 font-bold text-white">${doc.docNo || doc.p10running || ''}</td>
-            <td class="p-3 text-slate-300">${doc.type === 'BORROW' ? 'ยืมใช้งาน' : (doc.type === 'TRANSFER' ? 'โอนย้าย' : 'ส่งคืน')}</td>
-            <td class="p-3 text-emerald-400 font-semibold">${doc.toAgency || '-'}</td>
-            <td class="p-3">${(doc.items || []).length} รายการ</td>
-            <td class="p-3"><span class="px-2.5 py-0.5 rounded-full text-[10px] border font-semibold ${statusBadge}">${doc.docStatus || 'ยืมใช้งานอยู่'}</span></td>
-            <td class="p-3 text-slate-400 text-[10px]">${new Date(doc.createdAt).toLocaleString('th-TH')}</td>
-            <td class="p-3 text-right">
-              <button onclick="openP10DetailModal('${doc.docNo}')" class="px-2.5 py-1 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg font-semibold text-[10px]">
-                <i class="ri-file-search-line me-1"></i> ดูรายละเอียด
-              </button>
-            </td>
-          </tr>
-        `;
-      });
-    }
-
-    // อัปเดตฟังก์ชันค้นหาในหน้าปรับสถานะ (Tab 3) (รองรับกรองสถานะ)
-function applyStatusFilters() {
-  const query = document.getElementById('statusSearchInput').value.toLowerCase();
-  const selectedStatus = document.getElementById('filterStatusTab').value;
-
-  statusFilteredAssets = assetDataCache.filter(item => {
-    const matchQuery = !query ||
-      (item.assetNo && String(item.assetNo).toLowerCase().includes(query)) ||
-      (item.description1 && item.description1.toLowerCase().includes(query));
-    const matchStatus = !selectedStatus || (item.current_status && item.current_status.includes(selectedStatus));
-    return matchQuery && matchStatus;
-  });
-  statusCurrentPageNum = 1;
-  renderStatusPaginatedTable();
-}
-// ==========================================
-// 1. ฟังก์ชันพิมพ์ PDF โดยใช้ Template จาก Apps Script
-// ==========================================
-async function printCurrentP10Pdf() {
-  if (!activeP10Doc) return;
-  const docNo = activeP10Doc.docNo || activeP10Doc.p10running;
-  
-  showSpinner(true, 'กำลังดึงข้อมูลลง Template และสร้างไฟล์ PDF...');
-  
-  try {
-    const res = await callGAS("exportP10PdfFromTemplate", docNo);
-    showSpinner(false);
-    playAudio('success');
     
-    // เด้งหน้าต่างให้ผู้ใช้ดาวน์โหลดไฟล์
-    if (res.url) {
-        window.open(res.url, '_blank');
-    } else {
-        alert('สร้าง PDF สำเร็จ แต่ดึงลิงก์ไม่ทัน กรุณาตรวจสอบใน Google Drive');
-    }
-  } catch (err) {
-    showSpinner(false);
-    alert('เกิดข้อผิดพลาดในการสร้าง PDF: ' + err.message);
-  }
-}
-
-// ==========================================
-// 2. ฟังก์ชันปิดหน้า History Modal ที่หายไป
-// ==========================================
-function closeStatusHistoryModal() {
-  document.getElementById('statusHistoryModal').classList.add('hidden');
-}
-
-// ฟังก์ชันพิมพ์ PDF ฉบับแก้ไขให้ Canvas อ่านความสูงได้สมบูรณ์
-function printCurrentP10Pdf() {
-  if (!activeP10Doc) return;
-  const doc = activeP10Doc;
-  const printArea = document.getElementById('printableArea');
-  
-  printArea.innerHTML = `
-    <div id="p10ExportArea" style="padding: 40px; font-family: 'Sarabun', sans-serif; color: black; background: white; width: 210mm; box-sizing: border-box;">
-      <h2 style="text-align: center; margin-bottom: 5px; font-weight: bold;">ใบส่งของ (พ.10)</h2>
-      <p style="text-align: center; font-size: 14px; margin-top: 0;">ฝ่ายบริการธุรกิจขนส่งและโลจิสติกส์</p>
-      <hr style="border: 1px solid black; margin: 15px 0;">
-      
-      <table style="width: 100%; font-size: 14px; margin-bottom: 20px;">
-        <tr>
-          <td><strong>เลขที่เอกสาร:</strong> ${doc.docNo || doc.p10running}</td>
-          <td style="text-align: right;"><strong>ลงวันที่:</strong> ${new Date(doc.createdAt).toLocaleDateString('th-TH')}</td>
-        </tr>
-        <tr>
-          <td><strong>ถึงหน่วยงาน:</strong> ${doc.toAgency || '-'} (${doc.postCode || ''})</td>
-          <td style="text-align: right;"><strong>ประเภท:</strong> ${doc.type === 'BORROW' ? 'ยืมใช้งาน' : (doc.type === 'TRANSFER' ? 'โอนย้าย' : 'ส่งคืน')}</td>
-        </tr>
-      </table>
-
-      <table style="width: 100%; border-collapse: collapse; font-size: 14px;" border="1">
-        <thead>
-          <tr style="background: #f1f5f9;">
-            <th style="padding: 10px; border: 1px solid black; width: 10%; text-align: center;">ลำดับ</th>
-            <th style="padding: 10px; border: 1px solid black; width: 20%; text-align: center;">รหัสครุภัณฑ์</th>
-            <th style="padding: 10px; border: 1px solid black; width: 70%; text-align: left;">รายการครุภัณฑ์</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${(doc.items || []).map((item, idx) => {
-            const assetNo = typeof item === 'object' ? item.assetNo : item;
-            const assetObj = assetDataCache.find(x => x.assetNo === assetNo) || {};
-            return `
-              <tr>
-                <td style="padding: 8px; border: 1px solid black; text-align: center;">${idx + 1}</td>
-                <td style="padding: 8px; border: 1px solid black; text-align: center;">${assetNo}</td>
-                <td style="padding: 8px; border: 1px solid black;">${assetObj.description1 || '-'}</td>
-              </tr>
-            `;
-          }).join('')}
-        </tbody>
-      </table>
-
-      <div style="margin-top: 60px; display: flex; justify-content: space-between; font-size: 14px;">
-        <div style="text-align: center; width: 45%;">
-          <p>ลงชื่อ...................................................ผู้ส่ง</p>
-          <p>(${doc.userEmail || 'เจ้าหน้าที่'})</p>
-        </div>
-        <div style="text-align: center; width: 45%;">
-          <p>ลงชื่อ...................................................ผู้รับ</p>
-          <p>(${doc.toAgency || 'ผู้รับสิ่งของ'})</p>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // เทคนิคเลี่ยงหน้าขาว: ปลดล็อก hidden แล้วดัน Layer ออกไปนอกจอชั่วคราว
-  printArea.classList.remove('hidden');
-  printArea.style.display = 'block';
-  printArea.style.position = 'absolute';
-  printArea.style.top = '-9999px';
-  printArea.style.left = '-9999px';
-
-  const element = document.getElementById('p10ExportArea');
-  const opt = {
-    margin:       [10, 0, 10, 0],
-    filename:     `${doc.docNo || doc.p10running}.pdf`,
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-
-  showSpinner(true, 'กำลังสร้างไฟล์ PDF...');
-
-  html2pdf().set(opt).from(element).save().then(() => {
-    printArea.innerHTML = '';
-    printArea.style.display = 'none';
-    showSpinner(false);
-  });
-}
-    function changeQrPage(delta) {
-      qrCurrentPage += delta;
-      renderQrModalPage();
-    }
-
-    function truncateText(text, maxLength) {
-        if (!text) return '-';
-        if (text.length <= maxLength) return text;
-        return text.substring(0, maxLength) + '...';
+    function closeBatchQrModal() { 
+      document.getElementById('batchQrModal').classList.add('hidden'); 
     }
 
     function renderQrModalPage() {
@@ -2016,58 +1839,6 @@ function printCurrentP10Pdf() {
       XLSX.writeFile(wb, "Full_Asset_Import_Template.xlsx");
     }
 
-    function printQrStatusTags() {
-      const printArea = document.getElementById('printableArea');
-      const originalGrid = document.getElementById('qrStatusTagGrid');
-      
-      printArea.innerHTML = `
-        <div style="width: 210mm; margin: 0 auto; background: white; color: black; font-family: 'Sarabun', sans-serif;">
-          <h2 style="text-align: center; margin-bottom: 20px; font-weight: bold; font-size: 16px;">ป้าย QR Code ครุภัณฑ์</h2>
-          <div id="printQrGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;"></div>
-        </div>
-      `;
-      
-      const printGrid = document.getElementById('printQrGrid');
-      
-      Array.from(originalGrid.children).forEach((card) => {
-        const clone = card.cloneNode(true);
-        clone.removeAttribute('id');
-        const qrContainer = clone.querySelector('div[id^="qr_tag_"]');
-        if (qrContainer) qrContainer.removeAttribute('id');
-        
-        const canvas = clone.querySelector('canvas');
-        const img = clone.querySelector('img');
-        if (canvas) {
-          if (!img.src) img.src = canvas.toDataURL("image/png");
-          img.style.display = 'block';
-          img.style.width = '100%';
-          canvas.style.display = 'none';
-        }
-        
-        clone.style.border = '1px solid #cbd5e1';
-        clone.style.pageBreakInside = 'avoid';
-        clone.style.breakInside = 'avoid';
-        
-        printGrid.appendChild(clone);
-      });
-      
-      document.getElementById('mainApp').classList.add('hidden');
-      document.getElementById('batchQrModal').classList.add('hidden');
-      printArea.classList.remove('hidden');
-      
-      window.onafterprint = function() {
-        document.getElementById('mainApp').classList.remove('hidden');
-        document.getElementById('batchQrModal').classList.remove('hidden');
-        printArea.classList.add('hidden');
-        printArea.innerHTML = '';
-        window.onafterprint = null;
-      };
-
-      setTimeout(() => {
-        window.print();
-      }, 500);
-    }
-
     function renderStatusPaginatedTable() {
       const tbody = document.getElementById('statusTableBody');
       if (!tbody) return;
@@ -2163,166 +1934,6 @@ function printCurrentP10Pdf() {
       statusCurrentPageNum = 1;
       renderStatusPaginatedTable();
     }  
-    // ==========================================
-// 2. ฟังก์ชันหน้าต่างรายละเอียด พ.10 (รับคืนสินค้า/แนบรูป)
-// ==========================================
-function openP10DetailModal(docNo) {
-    const doc = p10DocsCache.find(x => x.docNo === docNo || x.p10running === docNo);
-    if (!doc) return;
-    activeP10Doc = doc;
-
-    document.getElementById('p10ModalTitle').innerHTML = `<i class="ri-file-text-line text-red-500"></i> จัดการใบ พ.10: <span class="text-emerald-400">${doc.docNo || doc.p10running}</span>`;
-    const content = document.getElementById('p10ModalContent');
-
-    // สร้างลิสต์ครุภัณฑ์พร้อม Checkbox สำหรับรับคืน
-    let itemsHtml = '';
-    let totalItems = (doc.items || []).length;
-    let returnedCount = 0;
-
-    (doc.items || []).forEach((itemId, idx) => {
-        const assetNo = typeof itemId === 'object' ? itemId.assetNo : itemId;
-        const assetObj = assetDataCache.find(x => x.assetNo === assetNo) || { current_status: 'ไม่ทราบ', description1: '-' };
-        
-        // เช็คว่าสถานะกลับมาเป็น "ใช้งานปกติ" หรือยัง (ถ้าใช่แปลว่าคืนแล้ว)
-        const isReturned = assetObj.current_status === 'ใช้งานปกติ';
-        if (isReturned) returnedCount++;
-
-        itemsHtml += `
-        <li class="flex justify-between items-center p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs">
-            <div class="flex items-center gap-2 overflow-hidden">
-                <input type="checkbox" id="return_chk_${idx}" value="${assetNo}" class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-emerald-500 shrink-0" ${isReturned ? 'checked disabled' : ''}>
-                <span class="truncate text-slate-300"><strong>${assetNo}</strong> - ${assetObj.description1}</span>
-            </div>
-            <div class="flex items-center gap-2 shrink-0">
-                <span class="px-2 py-1 rounded-md text-[10px] font-bold ${isReturned ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">${isReturned ? 'รับคืนแล้ว' : 'ยังไม่คืน'}</span>
-                <button onclick="removeP10Item(${idx})" class="text-slate-400 hover:text-red-400 ${isReturned ? 'hidden' : ''}"><i class="ri-delete-bin-line"></i></button>
-            </div>
-        </li>`;
-    });
-
-    let docStatusBadge = doc.docStatus === 'ส่งคืนสำเร็จ' ? 'text-emerald-400' : 'text-amber-400';
-
-    content.innerHTML = `
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-        <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800"><p class="text-slate-400 mb-1">ถึงหน่วยงาน:</p><p class="font-bold text-white">${doc.toAgency || '-'}</p></div>
-        <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800"><p class="text-slate-400 mb-1">ประเภท:</p><p class="font-bold text-white">${doc.type}</p></div>
-        <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 md:col-span-2"><p class="text-slate-400 mb-1">สถานะเอกสาร:</p><p class="font-bold ${docStatusBadge}">${doc.docStatus || 'ยืมใช้งานอยู่'} (${returnedCount}/${totalItems})</p></div>
-    </div>
-
-    <!-- ส่วนที่ 1: จัดการรับคืน -->
-    <div class="glass-card p-4 rounded-xl border border-slate-700 space-y-3">
-        <div class="flex flex-wrap justify-between items-center gap-2">
-            <h5 class="font-bold text-xs text-white"><i class="ri-checkbox-circle-line text-emerald-400 me-1"></i> รายการครุภัณฑ์ (ติ๊กเลือกเพื่อรับคืน)</h5>
-            <button onclick="processReturnP10Items()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-semibold flex items-center gap-1 shadow-lg shadow-emerald-500/20"><i class="ri-save-line"></i> ยืนยันรับคืน/เปลี่ยนสถานะ</button>
-        </div>
-        <ul class="space-y-2 max-h-40 overflow-y-auto hide-scrollbar">
-            ${itemsHtml || '<li class="text-slate-500 text-center py-2">ไม่มีรายการครุภัณฑ์</li>'}
-        </ul>
-        <div class="pt-2">
-            <label class="block text-[10px] text-slate-400 mb-1">หมายเหตุรับคืน / กรณีคืนไม่ครบ</label>
-            <input type="text" id="p10ModalStatusRemarks" class="w-full px-3 py-2 rounded-lg glass-input text-xs" placeholder="ระบุเหตุผลการคืนไม่ครบ..." value="${doc.statusRemarks || ''}">
-        </div>
-    </div>
-
-    <!-- ส่วนที่ 2: แนบภาพถ่าย (แยกโฟลเดอร์ตามเลข พ.10) -->
-    <div class="glass-card p-4 rounded-xl border border-slate-700 space-y-3">
-        <h5 class="font-bold text-xs text-white flex justify-between items-center">
-            <span><i class="ri-image-line text-red-500 me-1"></i> ภาพถ่ายเอกสาร / สภาพครุภัณฑ์ (เพิ่ม/ลบได้ตลอด)</span>
-        </h5>
-        <div class="flex flex-wrap items-center gap-2">
-            <input type="file" id="signedP10ImageInput" accept="image/*" class="text-xs text-slate-300 glass-input rounded-lg px-2 py-1.5 flex-1 min-w-[200px]">
-            <button onclick="uploadSignedImageToP10()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1"><i class="ri-upload-cloud-line"></i> อัปโหลด</button>
-        </div>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
-            ${(doc.signedImages || []).map(img => `
-            <div class="relative group bg-slate-900 border border-slate-800 p-1.5 rounded-xl text-center">
-                <img src="${img.url}" class="w-full h-24 object-cover rounded-lg">
-                <a href="${img.url}" target="_blank" class="text-[10px] text-blue-400 hover:text-blue-300 underline block mt-1 truncate">เปิดดูใน Drive</a>
-                <button onclick="deleteSignedP10Image('${img.fileId}')" class="absolute top-2 right-2 p-1 bg-red-600 hover:bg-red-500 text-white rounded-full text-[10px] shadow-lg"><i class="ri-delete-bin-line"></i></button>
-            </div>
-            `).join('')}
-        </div>
-    </div>
-    `;
-    document.getElementById('p10DetailModal').classList.remove('hidden');
-}
-
-function closeP10DetailModal() { document.getElementById('p10DetailModal').classList.add('hidden'); }
-// ==========================================
-// ฟังก์ชันประมวลผลการรับคืน (แก้ไขบั๊กโหลดไม่ขึ้น & สถานะไม่เปลี่ยน)
-// ==========================================
-async function processReturnP10Items() {
-    if (!activeP10Doc) return;
-    const doc = activeP10Doc;
-    let selectedToReturn = [];
-    let totalItems = (doc.items || []).length;
-    let alreadyReturnedCount = 0;
-
-    (doc.items || []).forEach((itemId, idx) => {
-        const chk = document.getElementById('return_chk_' + idx);
-        const assetNo = typeof itemId === 'object' ? itemId.assetNo : itemId;
-        if (chk) {
-            if (chk.checked && !chk.disabled) selectedToReturn.push(assetNo);
-            if (chk.disabled) alreadyReturnedCount++;
-        }
-    });
-
-    const remarks = document.getElementById('p10ModalStatusRemarks').value;
-
-    if (selectedToReturn.length === 0 && remarks === (doc.statusRemarks || '')) {
-        return alert('กรุณาติ๊กเลือกรายการที่ได้รับคืน หรือ อัปเดตหมายเหตุก่อนกดยืนยัน');
-    }
-
-    if (selectedToReturn.length > 0 && !confirm(`ยืนยันการรับคืนครุภัณฑ์จำนวน ${selectedToReturn.length} รายการ เข้าระบบคลัง?`)) return;
-
-    showSpinner(true, 'กำลังบันทึกข้อมูลการรับคืน...', { current: 0, total: selectedToReturn.length });
-
-    try {
-        // 1. เปลี่ยนสถานะ Asset ที่ถูกติ๊กให้กลับเป็น 'ใช้งานปกติ' (แบ่งหั่นทีละ 50 ป้องกัน Timeout)
-        if (selectedToReturn.length > 0) {
-            const chunkSize = 50;
-            let successCount = 0;
-            for (let i = 0; i < selectedToReturn.length; i += chunkSize) {
-                const chunk = selectedToReturn.slice(i, i + chunkSize);
-                await callGAS("updateAssetOperationalStatus", {
-                    assetNoList: chunk, status: "ใช้งานปกติ", holder: "-", remarks: `รับคืนจากใบ พ.10: ${doc.docNo || doc.p10running}`, 
-                    imageBase64: null, fileName: '', userEmail: currentUser ? currentUser.email : "Staff"
-                });
-                successCount += chunk.length;
-                showSpinner(true, 'กำลังบันทึกข้อมูลการรับคืน...', { current: successCount, total: selectedToReturn.length });
-            }
-        }
-
-        showSpinner(true, 'กำลังอัปเดตสถานะใบงาน พ.10...');
-
-        // 2. ประเมินสถานะของใบ พ.10 ภาพรวม
-        let newReturnedCount = alreadyReturnedCount + selectedToReturn.length;
-        let newDocStatus = doc.docStatus;
-
-        if (newReturnedCount === totalItems && totalItems > 0) newDocStatus = "ส่งคืนสำเร็จ"; 
-        else if (newReturnedCount > 0 && newReturnedCount < totalItems) newDocStatus = "ส่งคืนแล้วแต่ไม่ครบ"; 
-
-        // 3. บันทึกกลับลงเอกสาร พ.10
-        await callGAS("updateP10DocStatus", { 
-            docNo: doc.docNo || doc.p10running, docStatus: newDocStatus, statusRemarks: remarks 
-        });
-
-        // 4. รอจนดึงข้อมูลใหม่มาครบ 100% ค่อยเปิด Modal
-        await loadAssetData(); 
-        await loadP10DocumentsList(); // <- จุดสำคัญ: ต้องมี await ตรงนี้เพื่อดึง Cache ใหม่
-        
-        showSpinner(false); 
-        playAudio('success'); 
-        alert('อัปเดตการรับคืนสำเร็จ!');
-        
-        // รีเฟรช Modal ด้วยข้อมูลล่าสุด
-        const updatedDoc = p10DocsCache.find(x => x.docNo === (doc.docNo || doc.p10running));
-        if (updatedDoc) openP10DetailModal(updatedDoc.docNo || updatedDoc.p10running); 
-
-    } catch (err) {
-        showSpinner(false); alert('เกิดข้อผิดพลาด: ' + err.message);
-    }
-}
   </script>
 </body>
 </html>
