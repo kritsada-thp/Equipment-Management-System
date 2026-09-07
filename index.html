@@ -2026,6 +2026,77 @@
           </tr>`;
        });
     }
+    // ==========================================
+    // 8. ฟังก์ชันคำนวณอายุการใช้งานและวันที่ (ที่ขาดหายไป)
+    // ==========================================
+    function parseCustomDate(str) {
+      if(!str) return null; 
+      let d = new Date(str);
+      if(!isNaN(d.getTime())) return d;
+      let parts = str.split('/'); 
+      if(parts.length === 3) { 
+        let y = parseInt(parts[2]); 
+        if(y > 2400) y -= 543; // แปลง พ.ศ. เป็น ค.ศ.
+        return new Date(y, parts[1]-1, parts[0]); 
+      } 
+      return null;
+    }
+
+    function calculateRemainingLife(receivedDate, lifeYears, lifeMonths) {
+      const start = parseCustomDate(receivedDate); 
+      if(!start) return { text: '-', status: 'none' };
+      
+      const y = parseInt(lifeYears) || 0;
+      const m = parseInt(lifeMonths) || 0; 
+      if(!y && !m) return { text: '-', status: 'none' };
+      
+      const exp = new Date(start); 
+      exp.setFullYear(exp.getFullYear() + y); 
+      exp.setMonth(exp.getMonth() + m);
+      
+      const diffDays = Math.ceil((exp - new Date()) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays < 0) return { text: 'หมดอายุแล้ว', status: 'expired' };
+      if (diffDays <= 180) return { text: `ใกล้หมดอายุ`, status: 'warning' }; 
+      return { text: `ปกติ`, status: 'good' };
+    }
+    // ==========================================
+    // 9. ฟังก์ชันเรนเดอร์และกรองตารางเอกสาร พ.10 (Tab 1)
+    // ==========================================
+    function filterP10DocsTable() {
+      const statusFilter = document.getElementById('filterP10DocStatus').value;
+      const tbody = document.getElementById('p10DocsTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      
+      const filtered = p10DocsCache.filter(d => !statusFilter || d.docStatus === statusFilter);
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">ไม่พบรายการเอกสาร พ.10</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(doc => {
+        let statusBadge = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+        if (doc.docStatus === 'ส่งคืนสำเร็จ') statusBadge = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+        else if (doc.docStatus === 'ส่งคืนแล้วแต่ไม่ครบ') statusBadge = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-900/50">
+            <td class="p-3 font-bold text-white">${doc.docNo || doc.p10running || ''}</td>
+            <td class="p-3 text-slate-300">${doc.type === 'BORROW' ? 'ยืมใช้งาน' : (doc.type === 'TRANSFER' ? 'โอนย้าย' : 'ส่งคืน')}</td>
+            <td class="p-3 text-emerald-400 font-semibold">${doc.toAgency || '-'}</td>
+            <td class="p-3">${(doc.items || []).length} รายการ</td>
+            <td class="p-3"><span class="px-2.5 py-0.5 rounded-full text-[10px] border font-semibold ${statusBadge}">${doc.docStatus || 'ยืมใช้งานอยู่'}</span></td>
+            <td class="p-3 text-slate-400 text-[10px]">${new Date(doc.createdAt).toLocaleString('th-TH')}</td>
+            <td class="p-3 text-right">
+              <button onclick="openP10DetailModal('${doc.docNo || doc.p10running}')" class="px-2.5 py-1 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg font-semibold text-[10px] transition-colors">
+                <i class="ri-file-search-line me-1"></i> ดูรายละเอียด
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+    }
   </script>
 </body>
 </html>
