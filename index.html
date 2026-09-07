@@ -1995,6 +1995,37 @@
       document.getElementById('auditResultsArea').classList.remove('hidden'); 
       document.getElementById('auditLogList').innerHTML = `<div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"><i class="ri-checkbox-circle-line me-1"></i> เริ่มต้นรอบการตรวจนับสต็อกสำเร็จ! พร้อมสแกน QR Code ตรวจนับ</div>`; 
     }
+    // ==========================================
+    // 7. ฟังก์ชันจัดการหน้าต่างแจ้งเตือนหมดอายุ (Expiry Modal)
+    // ==========================================
+    function closeExpiryModal() { 
+      const modal = document.getElementById('expiryNotifyModal');
+      if (modal) modal.classList.add('hidden'); 
+    }
+
+    function openExpiryNotifyModal() { 
+      filteredExpiryAssets = [...expiredAssetsList]; 
+      renderExpiryTable(); 
+      document.getElementById('expiryNotifyModal').classList.remove('hidden'); 
+    }
+
+    function renderExpiryTable() {
+       const tbody = document.getElementById('expiryListBody'); 
+       if (!tbody) return;
+       tbody.innerHTML = ''; 
+       document.getElementById('expiryTotalText').innerText = filteredExpiryAssets.length;
+       
+       filteredExpiryAssets.slice(0, 15).forEach((item) => {
+          tbody.innerHTML += `
+          <tr class="hover:bg-slate-900/50">
+            <td class="p-3 text-center"><input type="checkbox" value="${item.assetNo}" class="rounded bg-slate-900 text-red-600"></td>
+            <td class="p-3 font-bold text-white">${item.assetNo}</td>
+            <td class="p-3">${item.description1||'-'}</td>
+            <td class="p-3">${item.receivedDate||'-'}</td>
+            <td class="p-3"><button onclick="markAsPendingDisposal(['${item.assetNo}'])" class="px-3 py-1 bg-red-600/20 hover:bg-red-600/40 text-red-400 rounded transition-colors">รอตัดจำหน่าย</button></td>
+          </tr>`;
+       });
+    }
   </script>
 </body>
 </html>
