@@ -2097,6 +2097,56 @@
         `;
       });
     }
+    // ==========================================
+    // 10. ฟังก์ชันวาดกราฟสถิติหน้าแดชบอร์ด (Charts)
+    // ==========================================
+    function renderCharts(data) {
+      if(window.catChart) window.catChart.destroy(); 
+      if(window.ccChart) window.ccChart.destroy();
+      
+      const total = data.length;
+      const borrowed = data.filter(i => i.current_status && (i.current_status.includes('ยืม') || i.current_status.includes('โอน'))).length;
+      const repairable = data.filter(i => i.current_status && i.current_status.includes('ซ่อม')).length;
+      const disposed = data.filter(i => i.current_status && (i.current_status.includes('ตัดจำหน่าย') || i.current_status.includes('ตัดแล้ว'))).length;
+      const normal = total - (borrowed + repairable + disposed);
+      
+      window.catChart = new Chart(document.getElementById('categoryChart'), { 
+          type:'pie', 
+          data:{ 
+              labels:['ใช้งานปกติ','ถูกยืม/โอนย้าย','ชำรุดซ่อมได้','รอตัดจำหน่าย/ตัดแล้ว'], 
+              datasets:[{ 
+                  data:[normal, borrowed, repairable, disposed], 
+                  backgroundColor:['#10b981','#3b82f6','#f59e0b','#ef4444'] 
+              }] 
+          }, 
+          options: { plugins: { legend: { labels: { color: '#94a3b8' } } } } 
+      });
+      
+      const classMap = {}; 
+      data.forEach(i => { 
+          const cls = i.assetClass || 'ไม่ระบุ'; 
+          classMap[cls] = (classMap[cls] || 0) + 1; 
+      });
+      
+      window.ccChart = new Chart(document.getElementById('costCenterChart'), { 
+          type:'bar', 
+          data:{ 
+              labels:Object.keys(classMap).slice(0, 6), 
+              datasets:[{ 
+                  label:'จำนวน (ชิ้น)', 
+                  data:Object.values(classMap).slice(0, 6), 
+                  backgroundColor:'#ef4444' 
+              }] 
+          }, 
+          options: { 
+              scales: { 
+                  x: { ticks: { color: '#94a3b8' } }, 
+                  y: { ticks: { color: '#94a3b8' } } 
+              }, 
+              plugins: { legend: { labels: { color: '#94a3b8' } } } 
+          } 
+      });
+    }
   </script>
 </body>
 </html>
